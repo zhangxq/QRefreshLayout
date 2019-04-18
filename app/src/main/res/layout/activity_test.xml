@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/btnRefresh"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:text="刷新" />
+
+        <Button
+            android:id="@+id/btnLoad"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:text="更多" />
+
+        <Button
+            android:id="@+id/btnCloseRefresh"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:text="关刷新" />
+
+        <Button
+            android:id="@+id/btnCloseLoad"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:text="关更多" />
+    </LinearLayout>
+
+    <com.zhangxq.myswiperefreshlayout.refreshLayout.MySwipeRefreshLayout
+        android:id="@+id/refreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ListView
+            android:id="@+id/listView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="#00000000" />
+    </com.zhangxq.myswiperefreshlayout.refreshLayout.MySwipeRefreshLayout>
+
+
+</LinearLayout>
