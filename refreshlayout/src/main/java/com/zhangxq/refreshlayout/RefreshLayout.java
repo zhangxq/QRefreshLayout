@@ -310,6 +310,7 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
     public void onNestedPreScroll(View target, int dx, int dy, int[] consumed) {
         if (nestedOverScroll > 0 && dy > 0 || nestedOverScroll < 0 && dy < 0) {
             nestedOverScroll -= dy;
+            consumed[1] = dy;
             onNestedDraging(nestedOverScroll);
         }
 
@@ -323,20 +324,20 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
     @Override
     public void onNestedScroll(final View target, final int dxConsumed, final int dyConsumed, final int dxUnconsumed, final int dyUnconsumed) {
         dispatchNestedScroll(dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, mParentOffsetInWindow);
-        int dy = dyUnconsumed;
+        int dy = dyUnconsumed + mParentOffsetInWindow[1];
         if (dy > 0 && !canChildScrollUp()) {
-//            if (dy > 50) dy = 50;
+            if (dy > 50) dy = 50;
             nestedOverScroll -= dy;
         }
         if (dy < 0 && !canChildScrollDown()) {
-//            if (dy < -50) dy = -50;
+            if (dy < -50) dy = -50;
             nestedOverScroll -= dy;
         }
         onNestedDraging(nestedOverScroll);
     }
 
     private void onNestedDraging(float offset) {
-        overScroll = offset * dragRate;
+        overScroll = offset * dragRate * 0.7f;
         if (overScroll > 0) {
             if (overScroll > overRefreshHeight) {
                 overScroll = overRefreshHeight;
