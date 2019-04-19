@@ -12,7 +12,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.zhangxq.myswiperefreshlayout.refreshLayout.MySwipeRefreshLayout;
+
+import com.zhangxq.refreshlayout.RefreshLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,52 +22,20 @@ import java.util.List;
  * Created by zhangxiaoqi on 2019/4/16.
  */
 
-public class TestActivity extends AppCompatActivity implements MySwipeRefreshLayout.OnRefreshListener, MySwipeRefreshLayout.OnLoadListener {
+public class ListViewActivity extends AppCompatActivity implements RefreshLayout.OnRefreshListener, RefreshLayout.OnLoadListener {
     private ListView listView;
     private ListAdapter adapter;
     private List<String> datas = new ArrayList<>();
-    private MySwipeRefreshLayout refreshLayout;
+    private RefreshLayout refreshLayout;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_test);
+        setContentView(R.layout.activity_listview);
         refreshLayout = findViewById(R.id.refreshLayout);
         refreshLayout.setOnRefreshListener(this);
         refreshLayout.setOnLoadListener(this);
         listView = findViewById(R.id.listView);
-
-        Button btnRefresh = findViewById(R.id.btnRefresh);
-        btnRefresh.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                refreshLayout.setRefreshing(true);
-            }
-        });
-
-        Button btnLoad = findViewById(R.id.btnLoad);
-        btnLoad.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                refreshLayout.setLoading(true);
-            }
-        });
-
-        Button btnCloseRefresh = findViewById(R.id.btnCloseRefresh);
-        btnCloseRefresh.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                refreshLayout.setRefreshing(false);
-            }
-        });
-
-        Button btnCloseLoad = findViewById(R.id.btnCloseLoad);
-        btnCloseLoad.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                refreshLayout.setLoading(false);
-            }
-        });
 
         adapter = new ListAdapter();
         listView.setAdapter(adapter);
@@ -131,7 +100,7 @@ public class TestActivity extends AppCompatActivity implements MySwipeRefreshLay
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                convertView = LayoutInflater.from(TestActivity.this).inflate(R.layout.view_list_item, null);
+                convertView = LayoutInflater.from(ListViewActivity.this).inflate(R.layout.view_list_item, null);
             }
             TextView tvTest = convertView.findViewById(R.id.tvTest);
             tvTest.setText(getItem(position));

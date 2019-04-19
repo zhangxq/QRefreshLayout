@@ -1,4 +1,4 @@
-package com.zhangxq.myswiperefreshlayout.refreshLayout;
+package com.zhangxq.refreshlayout;
 
 /**
  * Created by zhangxiaoqi on 2019/4/17.

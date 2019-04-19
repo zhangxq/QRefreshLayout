@@ -2,9 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
     android:orientation="vertical">
 
-    <com.zhangxq.myswiperefreshlayout.refreshLayout.MySwipeRefreshLayout
+    <com.zhangxq.refreshlayout.RefreshLayout
         android:id="@+id/refreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -12,9 +13,9 @@
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="match_parent"
-            android:layout_height="1000dp"
+            android:layout_height="match_parent"
             android:scaleType="centerCrop"
             android:src="@drawable/test" />
-    </com.zhangxq.myswiperefreshlayout.refreshLayout.MySwipeRefreshLayout>
+    </com.zhangxq.refreshlayout.RefreshLayout>
 
 </LinearLayout>

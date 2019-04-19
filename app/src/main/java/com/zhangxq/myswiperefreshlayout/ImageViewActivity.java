@@ -5,19 +5,20 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
-import com.zhangxq.myswiperefreshlayout.refreshLayout.MySwipeRefreshLayout;
+import com.zhangxq.refreshlayout.RefreshLayout;
+
 
 /**
  * Created by zhangxiaoqi on 2019/4/18.
  */
 
-public class ImageTestActivity extends AppCompatActivity implements MySwipeRefreshLayout.OnRefreshListener, MySwipeRefreshLayout.OnLoadListener {
-    MySwipeRefreshLayout refreshLayout;
+public class ImageViewActivity extends AppCompatActivity implements RefreshLayout.OnRefreshListener, RefreshLayout.OnLoadListener {
+    RefreshLayout refreshLayout;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_image_test);
+        setContentView(R.layout.activity_imageview);
         refreshLayout = findViewById(R.id.refreshLayout);
         refreshLayout.setOnRefreshListener(this);
         refreshLayout.setOnLoadListener(this);

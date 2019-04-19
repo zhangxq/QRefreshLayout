@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <com.zhangxq.myswiperefreshlayout.RefreshLayout
+    <com.zhangxq.refreshlayout.RefreshLayout
         android:id="@+id/refreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -13,5 +14,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:divider="#00000000" />
-    </com.zhangxq.myswiperefreshlayout.RefreshLayout>
-</RelativeLayout>
+
+    </com.zhangxq.refreshlayout.RefreshLayout>
+
+
+</LinearLayout>

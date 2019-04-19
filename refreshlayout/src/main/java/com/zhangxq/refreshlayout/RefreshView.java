@@ -1,4 +1,4 @@
-package com.zhangxq.myswiperefreshlayout.refreshLayout;
+package com.zhangxq.refreshlayout;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
@@ -8,8 +8,6 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import com.zhangxq.myswiperefreshlayout.R;
 
 /**
  * Created by zhangxiaoqi on 2019/4/17.
