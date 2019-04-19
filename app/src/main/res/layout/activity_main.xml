@@ -6,6 +6,12 @@
     android:padding="10dp">
 
     <Button
+        android:id="@+id/btnOld"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="SwipeRefreshLayout官方示例" />
+
+    <Button
         android:id="@+id/btnList"
         android:layout_width="match_parent"
         android:layout_height="50dp"
@@ -22,5 +28,11 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:text="ImageView示例" />
+
+    <Button
+        android:id="@+id/btnCoordinator"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="CoordinatorLayout示例" />
 
 </LinearLayout>

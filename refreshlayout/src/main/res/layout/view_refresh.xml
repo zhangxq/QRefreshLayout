@@ -8,8 +8,7 @@
         android:id="@+id/viewContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="#ffbcdaaa">
+        android:layout_alignParentBottom="true">
 
         <TextView
             android:id="@+id/tvContent"

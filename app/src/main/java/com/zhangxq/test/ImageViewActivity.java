@@ -1,4 +1,4 @@
-package com.zhangxq.myswiperefreshlayout;
+package com.zhangxq.test;
 
 import android.os.Bundle;
 import android.os.Handler;

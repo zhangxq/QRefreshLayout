@@ -34,7 +34,7 @@ public class RefreshView extends LinearLayout implements Refresh {
 
     @Override
     public void setHeight(float height) {
-        tvContent.setHeight((int) height);
+        tvContent.setHeight((int) height + 3);
         progressBar.setVisibility(GONE);
     }
 

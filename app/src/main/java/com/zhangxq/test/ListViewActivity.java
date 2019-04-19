@@ -1,15 +1,18 @@
-package com.zhangxq.myswiperefreshlayout;
+package com.zhangxq.test;
 
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 
 import com.zhangxq.refreshlayout.RefreshLayout;
 
@@ -17,28 +20,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by zhangxiaoqi on 2019/4/18.
+ * Created by zhangxiaoqi on 2019/4/16.
  */
 
-public class RecyclerViewActivity extends AppCompatActivity implements RefreshLayout.OnRefreshListener, RefreshLayout.OnLoadListener {
-    private RecyclerView recyclerView;
-    private RefreshLayout refreshLayout;
-
+public class ListViewActivity extends AppCompatActivity implements RefreshLayout.OnRefreshListener, RefreshLayout.OnLoadListener, AdapterView.OnItemClickListener {
+    private ListView listView;
+    private ListAdapter adapter;
     private List<String> datas = new ArrayList<>();
-    private RecyclerAdapter adapter;
+    private RefreshLayout refreshLayout;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recyclerview);
-        recyclerView = findViewById(R.id.recyclerView);
+        setContentView(R.layout.activity_listview);
         refreshLayout = findViewById(R.id.refreshLayout);
         refreshLayout.setOnRefreshListener(this);
         refreshLayout.setOnLoadListener(this);
+        listView = findViewById(R.id.listView);
+        listView.setOnItemClickListener(this);
 
-        adapter = new RecyclerAdapter();
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(adapter);
+        adapter = new ListAdapter();
+        listView.setAdapter(adapter);
         down();
     }
 
@@ -80,35 +82,42 @@ public class RecyclerViewActivity extends AppCompatActivity implements RefreshLa
         }, 1000);
     }
 
-    private class RecyclerAdapter extends RecyclerView.Adapter<ItemHolder> {
-
-        @Override
-        public ItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new ItemHolder(LayoutInflater.from(RecyclerViewActivity.this).inflate(R.layout.view_list_item, null));
-        }
-
-        @Override
-        public void onBindViewHolder(ItemHolder holder, int position) {
-            holder.tvTest.setText(datas.get(position));
-            if (position % 2 == 0) {
-                holder.tvTest.setBackgroundColor(0xffabcdef);
-            } else {
-                holder.tvTest.setBackgroundColor(0xffffffff);
-            }
-        }
-
-        @Override
-        public int getItemCount() {
-            return datas.size();
-        }
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Toast.makeText(this, position + "", Toast.LENGTH_SHORT).show();
     }
 
-    private class ItemHolder extends RecyclerView.ViewHolder {
-        TextView tvTest;
+    private class ListAdapter extends BaseAdapter {
 
-        public ItemHolder(View itemView) {
-            super(itemView);
-            tvTest = itemView.findViewById(R.id.tvTest);
+        @Override
+        public int getCount() {
+            return datas.size();
+        }
+
+        @Override
+        public String getItem(int position) {
+            return datas.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                convertView = LayoutInflater.from(ListViewActivity.this).inflate(R.layout.view_list_item, null);
+            }
+            TextView tvTest = convertView.findViewById(R.id.tvTest);
+            tvTest.setText(getItem(position));
+            if (position % 2 == 0) {
+                tvTest.setBackgroundColor(0xffabcdef);
+            } else {
+                tvTest.setBackgroundColor(0xffffffff);
+            }
+
+            return convertView;
         }
     }
 }
