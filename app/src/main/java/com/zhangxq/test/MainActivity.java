@@ -6,6 +6,12 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+import com.zhangxq.test.coordinatorlayout.CoordinatorLayoutActivity;
+import com.zhangxq.test.imageview.ImageViewActivity;
+import com.zhangxq.test.listview.ListViewActivity;
+import com.zhangxq.test.recyclerview.RecyclerViewActivity;
+import com.zhangxq.test.swiperefreshlayout.SwipeRefreshLayoutActivity;
+
 /**
  * Created by zhangxiaoqi on 2019/4/18.
  */

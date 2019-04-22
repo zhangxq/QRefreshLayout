@@ -16,10 +16,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ImageViewActivity" />
-        <activity android:name=".ListViewActivity" />
-        <activity android:name=".RecyclerViewActivity" />
-        <activity android:name=".CoordinatorLayoutActivity" />
-        <activity android:name=".SwipeRefreshLayoutActivity" />
+        <activity android:name=".imageview.ImageViewActivity" />
+        <activity android:name=".listview.ListViewActivity" />
+        <activity android:name=".recyclerview.RecyclerViewActivity" />
+        <activity android:name=".coordinatorlayout.CoordinatorLayoutActivity" />
+        <activity android:name=".swiperefreshlayout.SwipeRefreshLayoutActivity" />
     </application>
 </manifest>

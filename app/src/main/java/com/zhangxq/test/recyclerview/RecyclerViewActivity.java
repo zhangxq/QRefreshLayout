@@ -1,9 +1,8 @@
-package com.zhangxq.test;
+package com.zhangxq.test.recyclerview;
 
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,16 +11,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.zhangxq.refreshlayout.RefreshLayout;
+import com.zhangxq.test.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by zhangxiaoqi on 2019/4/19.
+ * Created by zhangxiaoqi on 2019/4/18.
  */
 
-public class SwipeRefreshLayoutActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
+public class RecyclerViewActivity extends AppCompatActivity implements RefreshLayout.OnRefreshListener, RefreshLayout.OnLoadListener {
     private RecyclerView recyclerView;
-    private SwipeRefreshLayout refreshLayout;
+    private RefreshLayout refreshLayout;
 
     private List<String> datas = new ArrayList<>();
     private RecyclerAdapter adapter;
@@ -29,10 +31,11 @@ public class SwipeRefreshLayoutActivity extends AppCompatActivity implements Swi
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_swiperefreshlayout);
+        setContentView(R.layout.activity_recyclerview);
         recyclerView = findViewById(R.id.recyclerView);
         refreshLayout = findViewById(R.id.refreshLayout);
         refreshLayout.setOnRefreshListener(this);
+        refreshLayout.setOnLoadListener(this);
 
         adapter = new RecyclerAdapter();
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -67,11 +70,22 @@ public class SwipeRefreshLayoutActivity extends AppCompatActivity implements Swi
         }, 1000);
     }
 
+    @Override
+    public void onLoad() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                up();
+                refreshLayout.setLoading(false);
+            }
+        }, 1000);
+    }
+
     private class RecyclerAdapter extends RecyclerView.Adapter<ItemHolder> {
 
         @Override
         public ItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new ItemHolder(LayoutInflater.from(SwipeRefreshLayoutActivity.this).inflate(R.layout.view_list_item, null));
+            return new ItemHolder(LayoutInflater.from(RecyclerViewActivity.this).inflate(R.layout.view_list_item, null));
         }
 
         @Override

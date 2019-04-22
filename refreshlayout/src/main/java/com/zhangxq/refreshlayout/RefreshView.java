@@ -6,11 +6,13 @@ import android.util.AttributeSet;
 import android.view.Gravity;
 import android.widget.RelativeLayout;
 
+import com.zhangxq.refreshlayout.defaultview.Refresh;
+
 /**
  * Created by zhangxiaoqi on 2019/4/22.
  */
 
-public abstract class RefreshView extends RelativeLayout {
+public abstract class RefreshView extends RelativeLayout implements Refresh {
     public RefreshView(Context context) {
         this(context, null);
     }
@@ -19,26 +21,4 @@ public abstract class RefreshView extends RelativeLayout {
         super(context, attrs);
         setGravity(Gravity.CENTER);
     }
-
-    /**
-     * 内容区高度变化
-     *
-     * @param height
-     */
-    public abstract void setHeight(float height);
-
-    /**
-     * 触发刷新
-     */
-    public abstract void setRefresh();
-
-    /**
-     * 下拉刷新
-     */
-    public abstract void setPullToRefresh();
-
-    /**
-     * 释放即可刷新
-     */
-    public abstract void setRefeaseToRefresh();
 }

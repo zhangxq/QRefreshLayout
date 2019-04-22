@@ -26,13 +26,16 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
-import android.support.v4.widget.CircularProgressDrawable;
 import android.support.v7.widget.AppCompatImageView;
+import android.util.AttributeSet;
 import android.view.View;
-import android.view.animation.Animation;
 
-class CircleImageView extends AppCompatImageView {
-
+/**
+ * Private class created to work around issues with AnimationListeners being
+ * called before the animation is actually complete and support shadows on older
+ * platforms.
+ */
+public class CircleImageView extends AppCompatImageView {
     private static final int KEY_SHADOW_COLOR = 0x1E000000;
     private static final int FILL_SHADOW_COLOR = 0x3D000000;
     // PX
@@ -41,12 +44,14 @@ class CircleImageView extends AppCompatImageView {
     private static final float SHADOW_RADIUS = 3.5f;
     private static final int SHADOW_ELEVATION = 4;
 
-    private Animation.AnimationListener mListener;
     int mShadowRadius;
-    private CircularProgressDrawable mProgress;
 
-    public CircleImageView(Context context, int color) {
-        super(context);
+    public CircleImageView(Context context) {
+        this(context, null);
+    }
+
+    public CircleImageView(Context context, AttributeSet attrs) {
+        super(context, attrs);
         final float density = getContext().getResources().getDisplayMetrics().density;
         final int shadowYOffset = (int) (density * Y_OFFSET);
         final int shadowXOffset = (int) (density * X_OFFSET);
@@ -65,13 +70,10 @@ class CircleImageView extends AppCompatImageView {
             final int padding = mShadowRadius;
             setPadding(padding, padding, padding, padding);
         }
-        circle.getPaint().setColor(color);
+        circle.getPaint().setColor(0xfffafafa);
         ViewCompat.setBackground(this, circle);
-
-        mProgress = new CircularProgressDrawable(getContext());
-        mProgress.setStyle(CircularProgressDrawable.DEFAULT);
-        setImageDrawable(mProgress);
     }
+
 
     private boolean elevationSupported() {
         return android.os.Build.VERSION.SDK_INT >= 21;
@@ -81,28 +83,7 @@ class CircleImageView extends AppCompatImageView {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         if (!elevationSupported()) {
-            setMeasuredDimension(getMeasuredWidth() + mShadowRadius * 2, getMeasuredHeight()
-                    + mShadowRadius * 2);
-        }
-    }
-
-    public void setAnimationListener(Animation.AnimationListener listener) {
-        mListener = listener;
-    }
-
-    @Override
-    public void onAnimationStart() {
-        super.onAnimationStart();
-        if (mListener != null) {
-            mListener.onAnimationStart(getAnimation());
-        }
-    }
-
-    @Override
-    public void onAnimationEnd() {
-        super.onAnimationEnd();
-        if (mListener != null) {
-            mListener.onAnimationEnd(getAnimation());
+            setMeasuredDimension(getMeasuredWidth() + mShadowRadius * 2, getMeasuredHeight() + mShadowRadius * 2);
         }
     }
 
@@ -148,9 +129,7 @@ class CircleImageView extends AppCompatImageView {
         }
 
         private void updateRadialGradient(int diameter) {
-            mRadialGradient = new RadialGradient(diameter / 2, diameter / 2,
-                    mShadowRadius, new int[]{FILL_SHADOW_COLOR, Color.TRANSPARENT},
-                    null, Shader.TileMode.CLAMP);
+            mRadialGradient = new RadialGradient(diameter / 2, diameter / 2, mShadowRadius, new int[]{FILL_SHADOW_COLOR, Color.TRANSPARENT}, null, Shader.TileMode.CLAMP);
             mShadowPaint.setShader(mRadialGradient);
         }
     }

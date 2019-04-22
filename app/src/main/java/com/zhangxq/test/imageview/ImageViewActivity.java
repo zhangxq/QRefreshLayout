@@ -1,4 +1,4 @@
-package com.zhangxq.test;
+package com.zhangxq.test.imageview;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
 import com.zhangxq.refreshlayout.RefreshLayout;
+import com.zhangxq.test.R;
 
 
 /**
@@ -22,6 +23,8 @@ public class ImageViewActivity extends AppCompatActivity implements RefreshLayou
         refreshLayout = findViewById(R.id.refreshLayout);
         refreshLayout.setOnRefreshListener(this);
         refreshLayout.setOnLoadListener(this);
+        refreshLayout.setColorSchemeColors(0xffff0000, 0xff00ff00, 0xff0000ff);
+        refreshLayout.setProgressBackgroundColorSchemeColor(0xffabcdef);
     }
 
     @Override
@@ -31,7 +34,7 @@ public class ImageViewActivity extends AppCompatActivity implements RefreshLayou
             public void run() {
                 refreshLayout.setRefreshing(false);
             }
-        }, 1000);
+        }, 10000);
     }
 
     @Override

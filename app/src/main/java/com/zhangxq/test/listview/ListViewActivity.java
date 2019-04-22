@@ -1,4 +1,4 @@
-package com.zhangxq.test;
+package com.zhangxq.test.listview;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 
 import com.zhangxq.refreshlayout.RefreshLayout;
+import com.zhangxq.test.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,13 +35,14 @@ public class ListViewActivity extends AppCompatActivity implements RefreshLayout
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_listview);
         refreshLayout = findViewById(R.id.refreshLayout);
+
         refreshLayout.setOnRefreshListener(this);
         refreshLayout.setOnLoadListener(this);
         refreshLayout.setRefreshView(new MyRefreshView(this));
         refreshLayout.setLoadView(new MyLoadView(this));
+
         listView = findViewById(R.id.listView);
         listView.setOnItemClickListener(this);
-
         adapter = new ListAdapter();
         listView.setAdapter(adapter);
         down();

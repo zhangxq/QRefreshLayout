@@ -1,55 +1,55 @@
-package com.zhangxq.refreshlayout.defaultview;
+package com.zhangxq.test.listview;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
-import com.zhangxq.refreshlayout.R;
 import com.zhangxq.refreshlayout.RefreshView;
+import com.zhangxq.test.R;
 
 /**
- * Created by zhangxiaoqi on 2019/4/22.
+ * Created by zhangxiaoqi on 2019/4/17.
  */
 
-public class DefaultLoadView extends RefreshView {
-    private ImageView ivPull;
+public class MyRefreshView extends RefreshView {
+    private TextView tvContent;
+    private View viewContent;
     private ProgressBar progressBar;
 
-    public DefaultLoadView(Context context) {
+    public MyRefreshView(Context context) {
         this(context, null);
     }
 
-    public DefaultLoadView(Context context, @Nullable AttributeSet attrs) {
+    public MyRefreshView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        View viewContent = LayoutInflater.from(context).inflate(R.layout.view_default_load, null);
+        viewContent = LayoutInflater.from(context).inflate(R.layout.view_refresh, null);
         addView(viewContent);
-        ivPull = viewContent.findViewById(R.id.ivPull);
+        tvContent = viewContent.findViewById(R.id.tvContent);
         progressBar = viewContent.findViewById(R.id.progressBar);
     }
 
     @Override
-    public void setHeight(float height) {
+    public void setHeight(float dragDistance, float distanceToRefresh, float totalDistance) {
         progressBar.setVisibility(GONE);
-        ivPull.setVisibility(VISIBLE);
     }
 
     @Override
     public void setRefresh() {
+        tvContent.setText("正在刷新");
         progressBar.setVisibility(VISIBLE);
-        ivPull.setVisibility(GONE);
     }
 
     @Override
     public void setPullToRefresh() {
-        ivPull.setRotation(180);
+        tvContent.setText("下拉刷新");
     }
 
     @Override
     public void setRefeaseToRefresh() {
-        ivPull.setRotation(0);
+        tvContent.setText("释放刷新");
     }
 }

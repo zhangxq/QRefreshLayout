@@ -1,9 +1,9 @@
-package com.zhangxq.test;
+package com.zhangxq.test.coordinatorlayout;
 
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,34 +12,35 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.zhangxq.refreshlayout.RefreshLayout;
+import com.zhangxq.test.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by zhangxiaoqi on 2019/4/19.
+ * Created by zhangxiaoqi on 2019/4/22.
  */
 
-public class CoordinatorLayoutActivity extends AppCompatActivity implements RefreshLayout.OnRefreshListener, RefreshLayout.OnLoadListener {
+public class PageFragment extends Fragment implements RefreshLayout.OnRefreshListener, RefreshLayout.OnLoadListener {
     private RecyclerView recyclerView;
     private RefreshLayout refreshLayout;
 
     private List<String> datas = new ArrayList<>();
     private RecyclerAdapter adapter;
-
+    @Nullable
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_coordinatorlayout);
-        recyclerView = findViewById(R.id.recyclerView);
-        refreshLayout = findViewById(R.id.refreshLayout);
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_page, null);
+        recyclerView = view.findViewById(R.id.recyclerView);
+        refreshLayout = view.findViewById(R.id.refreshLayout);
         refreshLayout.setOnRefreshListener(this);
         refreshLayout.setOnLoadListener(this);
 
         adapter = new RecyclerAdapter();
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(adapter);
         down();
+        return view;
     }
 
     private void down() {
@@ -84,7 +85,7 @@ public class CoordinatorLayoutActivity extends AppCompatActivity implements Refr
 
         @Override
         public ItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new ItemHolder(LayoutInflater.from(CoordinatorLayoutActivity.this).inflate(R.layout.view_list_item, null));
+            return new ItemHolder(LayoutInflater.from(getActivity()).inflate(R.layout.view_list_item, null));
         }
 
         @Override
