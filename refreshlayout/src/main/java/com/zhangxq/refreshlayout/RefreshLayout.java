@@ -7,12 +7,17 @@ import android.support.v4.view.NestedScrollingParent;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ListViewCompat;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
+
+import com.zhangxq.refreshlayout.defaultview.DefaultLoadView;
+import com.zhangxq.refreshlayout.defaultview.DefaultRefreshView;
 
 /**
  * Created by zhangxiaoqi on 2019/4/16.
@@ -33,8 +38,10 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
     private boolean isRefreshing; // 是否正在进行刷新动画
     private boolean isLoading; // 是否正在进行加载更多动画
     private boolean isAnimating; // 是否正在进行状态切换动画
+    private RelativeLayout viewRefreshContainer; // 下拉刷新view容器
+    private RelativeLayout viewLoadContainer; // 加载更多view容器
     private RefreshView viewRefresh; // 下拉刷新view
-    private LoadView viewLoad; // 加载更多view
+    private RefreshView viewLoad; // 加载更多view
     private final int viewContentHeight = 700; // 内容区高度
     private final int refreshMidHeight = 170; // 刷新高度，超过这个高度，松手即可刷新
     private final int loadMidHeight = 170; // 加载更多高度，超过这个高度，松手即可加载更多
@@ -64,22 +71,65 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
     public RefreshLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
-
         setNestedScrollingEnabled(true);
-        viewRefresh = new RefreshView(context);
-        addView(viewRefresh);
-        viewLoad = new LoadView(context);
-        addView(viewLoad);
+
+        viewRefresh = new DefaultRefreshView(context);
+        viewLoad = new DefaultLoadView(context);
+        viewRefreshContainer = new RelativeLayout(context);
+        viewRefreshContainer.setGravity(Gravity.CENTER);
+        viewRefreshContainer.addView(viewRefresh);
+        viewLoadContainer = new RelativeLayout(context);
+        viewLoadContainer.setGravity(Gravity.CENTER);
+        viewLoadContainer.addView(viewLoad);
+        addView(viewRefreshContainer);
+        addView(viewLoadContainer);
     }
 
+    /**
+     * 设置下拉刷新view
+     *
+     * @param refreshView
+     */
+    public void setRefreshView(RefreshView refreshView) {
+        this.viewRefresh = refreshView;
+        viewRefreshContainer.removeAllViews();
+        viewRefreshContainer.addView(viewRefresh);
+    }
+
+    /**
+     * 设置加载更多view
+     *
+     * @param loadView
+     */
+    public void setLoadView(RefreshView loadView) {
+        this.viewLoad = loadView;
+        viewLoadContainer.removeAllViews();
+        viewLoadContainer.addView(viewLoad);
+    }
+
+    /**
+     * 设置下拉刷新监听
+     *
+     * @param listener
+     */
     public void setOnRefreshListener(OnRefreshListener listener) {
         refreshListener = listener;
     }
 
+    /**
+     * 设置加载更多监听
+     *
+     * @param listener
+     */
     public void setOnLoadListener(OnLoadListener listener) {
         loadListener = listener;
     }
 
+    /**
+     * 设置是否显示正在刷新
+     *
+     * @param refreshing
+     */
     public void setRefreshing(boolean refreshing) {
         if (refreshing) {
             if (isRefreshing || isLoading || isDraging) return;
@@ -95,10 +145,20 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
         }
     }
 
+    /**
+     * 获取是否正在刷新
+     *
+     * @return
+     */
     public boolean isRefreshing() {
         return isRefreshing;
     }
 
+    /**
+     * 设置是否显示正在加载更多
+     *
+     * @param loading
+     */
     public void setLoading(boolean loading) {
         if (loading) {
             if (isLoading || isRefreshing || isDraging) return;
@@ -114,6 +174,11 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
         }
     }
 
+    /**
+     * 获取是否加载更多
+     *
+     * @return
+     */
     public boolean isLoading() {
         return isLoading;
     }
@@ -138,8 +203,8 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
         final int childHeight = height - getPaddingTop() - getPaddingBottom();
         child.layout(childLeft, childTop, childLeft + childWidth, childTop + childHeight);
 
-        viewRefresh.layout(0, -viewContentHeight / 2, width, viewContentHeight / 2);
-        viewLoad.layout(0, height - viewContentHeight / 2, width, height + viewContentHeight / 2);
+        viewRefreshContainer.layout(0, -viewContentHeight / 2, width, viewContentHeight / 2);
+        viewLoadContainer.layout(0, height - viewContentHeight / 2, width, height + viewContentHeight / 2);
     }
 
     @Override
@@ -154,10 +219,10 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
         viewTarget.measure(
                 MeasureSpec.makeMeasureSpec(getMeasuredWidth() - getPaddingLeft() - getPaddingRight(), MeasureSpec.EXACTLY),
                 MeasureSpec.makeMeasureSpec(getMeasuredHeight() - getPaddingTop() - getPaddingBottom(), MeasureSpec.EXACTLY));
-        viewRefresh.measure(
+        viewRefreshContainer.measure(
                 MeasureSpec.makeMeasureSpec(getMeasuredWidth() - getPaddingLeft() - getPaddingRight(), MeasureSpec.EXACTLY),
                 MeasureSpec.makeMeasureSpec(viewContentHeight, MeasureSpec.EXACTLY));
-        viewLoad.measure(
+        viewLoadContainer.measure(
                 MeasureSpec.makeMeasureSpec(getMeasuredWidth() - getPaddingLeft() - getPaddingRight(), MeasureSpec.EXACTLY),
                 MeasureSpec.makeMeasureSpec(viewContentHeight, MeasureSpec.EXACTLY));
     }
@@ -166,7 +231,7 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
         if (viewTarget == null) {
             for (int i = 0; i < getChildCount(); i++) {
                 View child = getChildAt(i);
-                if (!child.equals(viewRefresh) && !child.equals(viewLoad)) {
+                if (!child.equals(viewRefreshContainer) && !child.equals(viewLoadContainer)) {
                     viewTarget = child;
                     break;
                 }
@@ -220,7 +285,7 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
                 overScroll = (y - downY) * dragRate;
                 if (isDragDown && overScroll < 0 || !isDragDown && overScroll > 0) {
                     overScroll = 0;
-                    viewRefresh.setTranslationY(overScroll);
+                    viewRefreshContainer.setTranslationY(overScroll);
                     viewTarget.setTranslationY(overScroll);
                     viewLoad.setTranslationY(overScroll);
                     return false;
@@ -229,7 +294,7 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
                     if (overScroll > viewContentHeight / 2) {
                         overScroll = viewContentHeight / 2;
                     }
-                    viewRefresh.setTranslationY(overScroll / 2);
+                    viewRefreshContainer.setTranslationY(overScroll / 2);
                     viewTarget.setTranslationY(overScroll);
                 }
                 if (!isDragDown && overScroll <= 0) {
@@ -340,7 +405,7 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
             if (overScroll > viewContentHeight / 2) {
                 overScroll = viewContentHeight / 2;
             }
-            viewRefresh.setTranslationY(overScroll / 2);
+            viewRefreshContainer.setTranslationY(overScroll / 2);
             viewTarget.setTranslationY(overScroll);
             viewRefresh.setHeight(overScroll);
             if (overScroll > refreshMidHeight) {
@@ -392,7 +457,7 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
                 public void onAnimationUpdate(ValueAnimator animation) {
                     float height = (float) animation.getAnimatedValue();
                     overScroll = height;
-                    viewRefresh.setTranslationY(overScroll / 2);
+                    viewRefreshContainer.setTranslationY(overScroll / 2);
                     viewRefresh.setHeight(overScroll);
                     viewTarget.setTranslationY(overScroll);
                     if (height == refreshHeight) {
@@ -454,7 +519,7 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
                 public void onAnimationUpdate(ValueAnimator animation) {
                     float height = (float) animation.getAnimatedValue();
                     overScroll = height;
-                    viewRefresh.setTranslationY(overScroll / 2);
+                    viewRefreshContainer.setTranslationY(overScroll / 2);
                     viewRefresh.setHeight(overScroll);
                     viewTarget.setTranslationY(overScroll);
                     isRefreshing = false;
@@ -503,7 +568,7 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
         if (animatorToRefreshReset != null) animatorToRefreshReset.cancel();
         if (animatorToLoad != null) animatorToLoad.cancel();
         if (animatorToLoadReset != null) animatorToLoadReset.cancel();
-        viewRefresh.setTranslationY(0);
+        viewRefreshContainer.setTranslationY(0);
         viewLoad.setTranslationY(0);
         viewTarget.setTranslationY(0);
     }

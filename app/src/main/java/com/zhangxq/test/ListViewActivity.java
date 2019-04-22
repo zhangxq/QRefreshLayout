@@ -36,6 +36,8 @@ public class ListViewActivity extends AppCompatActivity implements RefreshLayout
         refreshLayout = findViewById(R.id.refreshLayout);
         refreshLayout.setOnRefreshListener(this);
         refreshLayout.setOnLoadListener(this);
+        refreshLayout.setRefreshView(new MyRefreshView(this));
+        refreshLayout.setLoadView(new MyLoadView(this));
         listView = findViewById(R.id.listView);
         listView.setOnItemClickListener(this);
 
