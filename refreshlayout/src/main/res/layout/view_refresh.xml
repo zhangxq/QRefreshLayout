@@ -7,8 +7,22 @@
     <RelativeLayout
         android:id="@+id/viewContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_alignParentBottom="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="40dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:layout_centerInParent="true"
+                android:scaleType="centerCrop"
+                android:src="@drawable/test1" />
+
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/tvContent"
@@ -16,8 +30,8 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:gravity="center"
-            android:minHeight="20dp"
-            android:text="下拉刷新" />
+            android:text="下拉刷新"
+            android:textColor="#ffffffff" />
 
         <ProgressBar
             android:id="@+id/progressBar"
@@ -26,7 +40,6 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="10dp"
             android:layout_toLeftOf="@+id/tvContent"
-            android:visibility="gone" />
-
+            android:visibility="visible" />
     </RelativeLayout>
 </RelativeLayout>

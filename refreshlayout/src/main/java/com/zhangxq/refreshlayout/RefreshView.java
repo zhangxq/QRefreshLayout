@@ -5,8 +5,10 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 /**
@@ -14,7 +16,6 @@ import android.widget.TextView;
  */
 
 public class RefreshView extends LinearLayout implements Refresh {
-    private View viewContainer;
     private TextView tvContent;
     private View viewContent;
     private ProgressBar progressBar;
@@ -29,12 +30,10 @@ public class RefreshView extends LinearLayout implements Refresh {
         addView(viewContent);
         tvContent = viewContent.findViewById(R.id.tvContent);
         progressBar = viewContent.findViewById(R.id.progressBar);
-        viewContainer = viewContent.findViewById(R.id.viewContainer);
     }
 
     @Override
     public void setHeight(float height) {
-        tvContent.setHeight((int) height + 3);
         progressBar.setVisibility(GONE);
     }
 
@@ -52,13 +51,5 @@ public class RefreshView extends LinearLayout implements Refresh {
     @Override
     public void setRefeaseToRefresh() {
         tvContent.setText("释放刷新");
-    }
-
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        viewContent.measure(
-                MeasureSpec.makeMeasureSpec(getMeasuredWidth() - getPaddingLeft() - getPaddingRight(), MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(getMeasuredHeight() - getPaddingTop() - getPaddingBottom(), MeasureSpec.EXACTLY));
     }
 }

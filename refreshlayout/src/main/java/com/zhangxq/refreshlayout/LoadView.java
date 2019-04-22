@@ -14,7 +14,6 @@ import android.widget.TextView;
  */
 
 public class LoadView extends LinearLayout implements Refresh {
-    private View viewContainer;
     private TextView tvContent;
     private View viewContent;
     private ProgressBar progressBar;
@@ -29,12 +28,10 @@ public class LoadView extends LinearLayout implements Refresh {
         addView(viewContent);
         tvContent = viewContent.findViewById(R.id.tvContent);
         progressBar = viewContent.findViewById(R.id.progressBar);
-        viewContainer = viewContent.findViewById(R.id.viewContainer);
     }
 
     @Override
     public void setHeight(float height) {
-        tvContent.setHeight((int) height);
         progressBar.setVisibility(GONE);
     }
 
@@ -52,13 +49,5 @@ public class LoadView extends LinearLayout implements Refresh {
     @Override
     public void setRefeaseToRefresh() {
         tvContent.setText("释放加载更多");
-    }
-
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        viewContent.measure(
-                MeasureSpec.makeMeasureSpec(getMeasuredWidth() - getPaddingLeft() - getPaddingRight(), MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(getMeasuredHeight() - getPaddingTop() - getPaddingBottom(), MeasureSpec.EXACTLY));
     }
 }

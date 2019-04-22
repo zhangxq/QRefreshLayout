@@ -35,14 +35,12 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
     private boolean isAnimating; // 是否正在进行状态切换动画
     private RefreshView viewRefresh; // 下拉刷新view
     private LoadView viewLoad; // 加载更多view
-    private final int viewRefreshHeight = 500; // 下拉刷新和加载更多内容区高度
-    private final int overRefreshHeight = 200; // 下拉刷新最大高度
-    private final int overLoadHeight = 200; // 加载更多最大高度
+    private final int viewContentHeight = 700; // 内容区高度
     private final int refreshMidHeight = 170; // 刷新高度，超过这个高度，松手即可刷新
     private final int loadMidHeight = 170; // 加载更多高度，超过这个高度，松手即可加载更多
-    private final int refreshHeight = 100; // 刷新动画高度
+    private final int refreshHeight = 150; // 刷新动画高度
     private final int loadHeight = 100; // 加载更多动画高度
-    private final int animateDuration = 100; // 动画时间，100ms
+    private final int animateDuration = 100; // 动画时间ms
 
     // nested 相关参数
     private float nestedOverScroll;
@@ -140,8 +138,8 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
         final int childHeight = height - getPaddingTop() - getPaddingBottom();
         child.layout(childLeft, childTop, childLeft + childWidth, childTop + childHeight);
 
-        viewRefresh.layout(0, -viewRefreshHeight, width, 0);
-        viewLoad.layout(0, height, width, height + viewRefreshHeight);
+        viewRefresh.layout(0, -viewContentHeight / 2, width, viewContentHeight / 2);
+        viewLoad.layout(0, height - viewContentHeight / 2, width, height + viewContentHeight / 2);
     }
 
     @Override
@@ -158,10 +156,10 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
                 MeasureSpec.makeMeasureSpec(getMeasuredHeight() - getPaddingTop() - getPaddingBottom(), MeasureSpec.EXACTLY));
         viewRefresh.measure(
                 MeasureSpec.makeMeasureSpec(getMeasuredWidth() - getPaddingLeft() - getPaddingRight(), MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(viewRefreshHeight, MeasureSpec.EXACTLY));
+                MeasureSpec.makeMeasureSpec(viewContentHeight, MeasureSpec.EXACTLY));
         viewLoad.measure(
                 MeasureSpec.makeMeasureSpec(getMeasuredWidth() - getPaddingLeft() - getPaddingRight(), MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(viewRefreshHeight, MeasureSpec.EXACTLY));
+                MeasureSpec.makeMeasureSpec(viewContentHeight, MeasureSpec.EXACTLY));
     }
 
     private void ensureTarget() {
@@ -228,17 +226,17 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
                     return false;
                 }
                 if (isDragDown && overScroll >= 0) {
-                    if (overScroll > overRefreshHeight) {
-                        overScroll = overRefreshHeight;
+                    if (overScroll > viewContentHeight / 2) {
+                        overScroll = viewContentHeight / 2;
                     }
-                    viewRefresh.setTranslationY(overScroll);
+                    viewRefresh.setTranslationY(overScroll / 2);
                     viewTarget.setTranslationY(overScroll);
                 }
                 if (!isDragDown && overScroll <= 0) {
-                    if (Math.abs(overScroll) > overLoadHeight) {
-                        overScroll = -overLoadHeight;
+                    if (Math.abs(overScroll) > viewContentHeight / 2) {
+                        overScroll = -viewContentHeight / 2;
                     }
-                    viewLoad.setTranslationY(overScroll);
+                    viewLoad.setTranslationY(overScroll / 2);
                     viewTarget.setTranslationY(overScroll);
                 }
 
@@ -339,10 +337,10 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
     private void onNestedDraging(float offset) {
         overScroll = offset * dragRate * 0.7f;
         if (overScroll > 0) {
-            if (overScroll > overRefreshHeight) {
-                overScroll = overRefreshHeight;
+            if (overScroll > viewContentHeight / 2) {
+                overScroll = viewContentHeight / 2;
             }
-            viewRefresh.setTranslationY(overScroll);
+            viewRefresh.setTranslationY(overScroll / 2);
             viewTarget.setTranslationY(overScroll);
             viewRefresh.setHeight(overScroll);
             if (overScroll > refreshMidHeight) {
@@ -351,10 +349,10 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
                 viewRefresh.setPullToRefresh();
             }
         } else {
-            if (overScroll < -overLoadHeight) {
-                overScroll = -overLoadHeight;
+            if (overScroll < -viewContentHeight / 2) {
+                overScroll = -viewContentHeight / 2;
             }
-            viewLoad.setTranslationY(overScroll);
+            viewLoad.setTranslationY(overScroll / 2);
             viewTarget.setTranslationY(overScroll);
             viewLoad.setHeight(Math.abs(overScroll));
             if (overScroll < -loadMidHeight) {
@@ -394,9 +392,9 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
                 public void onAnimationUpdate(ValueAnimator animation) {
                     float height = (float) animation.getAnimatedValue();
                     overScroll = height;
-                    viewRefresh.setTranslationY(height);
-                    viewRefresh.setHeight(height);
-                    viewTarget.setTranslationY(height);
+                    viewRefresh.setTranslationY(overScroll / 2);
+                    viewRefresh.setHeight(overScroll);
+                    viewTarget.setTranslationY(overScroll);
                     if (height == refreshHeight) {
                         viewRefresh.setRefresh();
                         isRefreshing = true;
@@ -425,9 +423,9 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
                 public void onAnimationUpdate(ValueAnimator animation) {
                     float height = (float) animation.getAnimatedValue();
                     overScroll = height;
-                    viewLoad.setTranslationY(height);
-                    viewLoad.setHeight(Math.abs(height));
-                    viewTarget.setTranslationY(height);
+                    viewLoad.setTranslationY(overScroll / 2);
+                    viewLoad.setHeight(Math.abs(overScroll));
+                    viewTarget.setTranslationY(overScroll);
                     if (height == -loadHeight) {
                         viewLoad.setRefresh();
                         isLoading = true;
@@ -456,9 +454,9 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
                 public void onAnimationUpdate(ValueAnimator animation) {
                     float height = (float) animation.getAnimatedValue();
                     overScroll = height;
-                    viewRefresh.setTranslationY(height);
-                    viewRefresh.setHeight(height);
-                    viewTarget.setTranslationY(height);
+                    viewRefresh.setTranslationY(overScroll / 2);
+                    viewRefresh.setHeight(overScroll);
+                    viewTarget.setTranslationY(overScroll);
                     isRefreshing = false;
                     if (height == 0) {
                         isAnimating = false;
@@ -483,9 +481,9 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
                 public void onAnimationUpdate(ValueAnimator animation) {
                     float height = (float) animation.getAnimatedValue();
                     overScroll = height;
-                    viewLoad.setTranslationY(height);
-                    viewLoad.setHeight(Math.abs(height));
-                    viewTarget.setTranslationY(height);
+                    viewLoad.setTranslationY(overScroll / 2);
+                    viewLoad.setHeight(Math.abs(overScroll));
+                    viewTarget.setTranslationY(overScroll);
                     isLoading = false;
                     if (height == 0) {
                         isAnimating = false;
