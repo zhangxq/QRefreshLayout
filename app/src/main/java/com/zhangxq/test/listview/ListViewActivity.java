@@ -14,7 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-import com.zhangxq.refreshlayout.RefreshLayout;
+import com.zhangxq.refreshlayout.QRefreshLayout;
 import com.zhangxq.test.R;
 
 import java.util.ArrayList;
@@ -24,22 +24,22 @@ import java.util.List;
  * Created by zhangxiaoqi on 2019/4/16.
  */
 
-public class ListViewActivity extends AppCompatActivity implements RefreshLayout.OnRefreshListener, RefreshLayout.OnLoadListener, AdapterView.OnItemClickListener {
+public class ListViewActivity extends AppCompatActivity implements QRefreshLayout.OnRefreshListener, QRefreshLayout.OnLoadListener, AdapterView.OnItemClickListener {
     private ListView listView;
     private ListAdapter adapter;
     private List<String> datas = new ArrayList<>();
-    private RefreshLayout refreshLayout;
+    private QRefreshLayout QRefreshLayout;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_listview);
-        refreshLayout = findViewById(R.id.refreshLayout);
+        QRefreshLayout = findViewById(R.id.refreshLayout);
 
-        refreshLayout.setOnRefreshListener(this);
-        refreshLayout.setOnLoadListener(this);
-        refreshLayout.setRefreshView(new MyRefreshView(this));
-        refreshLayout.setLoadView(new MyLoadView(this));
+        QRefreshLayout.setOnRefreshListener(this);
+        QRefreshLayout.setOnLoadListener(this);
+        QRefreshLayout.setRefreshView(new MyRefreshView(this));
+        QRefreshLayout.setLoadView(new MyLoadView(this));
 
         listView = findViewById(R.id.listView);
         listView.setOnItemClickListener(this);
@@ -70,7 +70,7 @@ public class ListViewActivity extends AppCompatActivity implements RefreshLayout
             @Override
             public void run() {
                 down();
-                refreshLayout.setRefreshing(false);
+                QRefreshLayout.setRefreshing(false);
             }
         }, 1000);
     }
@@ -81,7 +81,7 @@ public class ListViewActivity extends AppCompatActivity implements RefreshLayout
             @Override
             public void run() {
                 up();
-                refreshLayout.setLoading(false);
+                QRefreshLayout.setLoading(false);
             }
         }, 1000);
     }

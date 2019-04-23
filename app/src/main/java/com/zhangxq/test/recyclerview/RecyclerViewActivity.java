@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.zhangxq.refreshlayout.RefreshLayout;
+import com.zhangxq.refreshlayout.QRefreshLayout;
 import com.zhangxq.test.R;
 
 import java.util.ArrayList;
@@ -21,9 +21,9 @@ import java.util.List;
  * Created by zhangxiaoqi on 2019/4/18.
  */
 
-public class RecyclerViewActivity extends AppCompatActivity implements RefreshLayout.OnRefreshListener, RefreshLayout.OnLoadListener {
+public class RecyclerViewActivity extends AppCompatActivity implements QRefreshLayout.OnRefreshListener, QRefreshLayout.OnLoadListener {
     private RecyclerView recyclerView;
-    private RefreshLayout refreshLayout;
+    private QRefreshLayout QRefreshLayout;
 
     private List<String> datas = new ArrayList<>();
     private RecyclerAdapter adapter;
@@ -33,9 +33,9 @@ public class RecyclerViewActivity extends AppCompatActivity implements RefreshLa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recyclerview);
         recyclerView = findViewById(R.id.recyclerView);
-        refreshLayout = findViewById(R.id.refreshLayout);
-        refreshLayout.setOnRefreshListener(this);
-        refreshLayout.setOnLoadListener(this);
+        QRefreshLayout = findViewById(R.id.refreshLayout);
+        QRefreshLayout.setOnRefreshListener(this);
+        QRefreshLayout.setOnLoadListener(this);
 
         adapter = new RecyclerAdapter();
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -65,7 +65,7 @@ public class RecyclerViewActivity extends AppCompatActivity implements RefreshLa
             @Override
             public void run() {
                 down();
-                refreshLayout.setRefreshing(false);
+                QRefreshLayout.setRefreshing(false);
             }
         }, 1000);
     }
@@ -76,7 +76,7 @@ public class RecyclerViewActivity extends AppCompatActivity implements RefreshLa
             @Override
             public void run() {
                 up();
-                refreshLayout.setLoading(false);
+                QRefreshLayout.setLoading(false);
             }
         }, 1000);
     }

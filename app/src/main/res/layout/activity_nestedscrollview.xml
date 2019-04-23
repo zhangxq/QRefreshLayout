@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.zhangxq.refreshlayout.RefreshLayout
+    <com.zhangxq.refreshlayout.QRefreshLayout
         android:id="@+id/refreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -26,5 +26,5 @@
                     android:src="@drawable/img_test1" />
             </LinearLayout>
         </android.support.v4.widget.NestedScrollView>
-    </com.zhangxq.refreshlayout.RefreshLayout>
+    </com.zhangxq.refreshlayout.QRefreshLayout>
 </LinearLayout>

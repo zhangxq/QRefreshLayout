@@ -27,7 +27,7 @@ import com.zhangxq.refreshlayout.defaultview.DefaultRefreshView;
  * Created by zhangxiaoqi on 2019/4/16.
  */
 
-public class RefreshLayout extends ViewGroup implements NestedScrollingParent, NestedScrollingChild {
+public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, NestedScrollingChild {
     private View viewTarget; // 刷新目标
 
     // 滑动事件相关参数
@@ -72,11 +72,11 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
     private OnRefreshListener refreshListener;
     private OnLoadListener loadListener;
 
-    public RefreshLayout(Context context) {
+    public QRefreshLayout(Context context) {
         this(context, null);
     }
 
-    public RefreshLayout(Context context, AttributeSet attrs) {
+    public QRefreshLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
         setNestedScrollingEnabled(true);
@@ -333,7 +333,7 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
 
                 @Override
                 public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                    RefreshLayout.this.onScroll();
+                    QRefreshLayout.this.onScroll();
                 }
             });
         }
@@ -378,6 +378,7 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
                 if (yDiff < -mTouchSlop && !canChildScrollUp() && isLoadEnable) {
                     isDragDown = false;
                     isDraging = true;
+                    downY = y;
                 }
                 break;
             case MotionEvent.ACTION_UP:

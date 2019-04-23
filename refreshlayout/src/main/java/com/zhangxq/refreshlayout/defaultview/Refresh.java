@@ -12,20 +12,20 @@ public interface Refresh {
      * @param distanceToRefresh 下拉到触发刷新位置的距离
      * @param totalDistance     总的下拉空间
      */
-    public abstract void setHeight(float dragDistance, float distanceToRefresh, float totalDistance);
+    void setHeight(float dragDistance, float distanceToRefresh, float totalDistance);
 
     /**
      * 触发刷新
      */
-    public abstract void setRefresh();
+    void setRefresh();
 
     /**
      * 下拉刷新
      */
-    public abstract void setPullToRefresh();
+    void setPullToRefresh();
 
     /**
      * 释放即可刷新
      */
-    public abstract void setRefeaseToRefresh();
+    void setRefeaseToRefresh();
 }

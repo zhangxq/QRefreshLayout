@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.zhangxq.refreshlayout.RefreshLayout;
+import com.zhangxq.refreshlayout.QRefreshLayout;
 import com.zhangxq.test.R;
 
 import java.util.ArrayList;
@@ -21,9 +21,9 @@ import java.util.List;
  * Created by zhangxiaoqi on 2019/4/22.
  */
 
-public class PageFragment extends Fragment implements RefreshLayout.OnRefreshListener, RefreshLayout.OnLoadListener {
+public class PageFragment extends Fragment implements QRefreshLayout.OnRefreshListener, QRefreshLayout.OnLoadListener {
     private RecyclerView recyclerView;
-    private RefreshLayout refreshLayout;
+    private QRefreshLayout QRefreshLayout;
 
     private List<String> datas = new ArrayList<>();
     private RecyclerAdapter adapter;
@@ -32,9 +32,9 @@ public class PageFragment extends Fragment implements RefreshLayout.OnRefreshLis
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_page, null);
         recyclerView = view.findViewById(R.id.recyclerView);
-        refreshLayout = view.findViewById(R.id.refreshLayout);
-        refreshLayout.setOnRefreshListener(this);
-        refreshLayout.setOnLoadListener(this);
+        QRefreshLayout = view.findViewById(R.id.refreshLayout);
+        QRefreshLayout.setOnRefreshListener(this);
+        QRefreshLayout.setOnLoadListener(this);
 
         adapter = new RecyclerAdapter();
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -65,7 +65,7 @@ public class PageFragment extends Fragment implements RefreshLayout.OnRefreshLis
             @Override
             public void run() {
                 down();
-                refreshLayout.setRefreshing(false);
+                QRefreshLayout.setRefreshing(false);
             }
         }, 1000);
     }
@@ -76,7 +76,7 @@ public class PageFragment extends Fragment implements RefreshLayout.OnRefreshLis
             @Override
             public void run() {
                 up();
-                refreshLayout.setLoading(false);
+                QRefreshLayout.setLoading(false);
             }
         }, 1000);
     }
