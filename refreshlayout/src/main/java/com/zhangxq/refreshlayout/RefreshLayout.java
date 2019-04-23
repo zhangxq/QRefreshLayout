@@ -9,7 +9,9 @@ import android.support.v4.view.NestedScrollingChild;
 import android.support.v4.view.NestedScrollingParent;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ListViewCompat;
+import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,7 +21,8 @@ import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
-import com.zhangxq.refreshlayout.defaultview.DefaultView;
+import com.zhangxq.refreshlayout.defaultview.DefaultLoadView;
+import com.zhangxq.refreshlayout.defaultview.DefaultRefreshView;
 
 /**
  * Created by zhangxiaoqi on 2019/4/16.
@@ -40,15 +43,19 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
     private boolean isRefreshing; // 是否正在进行刷新动画
     private boolean isLoading; // 是否正在进行加载更多动画
     private boolean isAnimating; // 是否正在进行状态切换动画
+    private boolean isLoadEnable; // 是否可以加载更多
+    private boolean isAutoLoad; // 是否打开自动加载更多
+    private boolean isTouchDown; // 手指是否按下
+    private boolean isPullingUp; // 是否手指上滑
     private RelativeLayout viewRefreshContainer; // 下拉刷新view容器
     private RelativeLayout viewLoadContainer; // 加载更多view容器
     private RefreshView viewRefresh; // 下拉刷新view
     private RefreshView viewLoad; // 加载更多view
-    private final int viewContentHeight = 700; // 内容区高度
+    private final int viewContentHeight = 2000; // 内容区高度
     private final int refreshMidHeight = 170; // 刷新高度，超过这个高度，松手即可刷新
     private final int loadMidHeight = 170; // 加载更多高度，超过这个高度，松手即可加载更多
     private final int refreshHeight = 150; // 刷新动画高度
-    private final int loadHeight = 150; // 加载更多动画高度
+    private final int loadHeight = 110; // 加载更多动画高度
     private final int animateDuration = 100; // 动画时间ms
 
     // nested 相关参数
@@ -75,16 +82,35 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
         mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
         setNestedScrollingEnabled(true);
 
-        viewRefresh = new DefaultView(context);
-        viewLoad = new DefaultView(context);
+        viewRefresh = new DefaultRefreshView(context);
+        viewLoad = new DefaultLoadView(context);
         viewRefreshContainer = new RelativeLayout(context);
         viewRefreshContainer.setGravity(Gravity.CENTER);
         viewRefreshContainer.addView(viewRefresh);
         viewLoadContainer = new RelativeLayout(context);
         viewLoadContainer.setGravity(Gravity.CENTER);
         viewLoadContainer.addView(viewLoad);
+        viewLoadContainer.setVisibility(GONE);
         addView(viewRefreshContainer);
         addView(viewLoadContainer);
+    }
+
+    public void setLoadEnable(boolean isEnable) {
+        this.isLoadEnable = isEnable;
+        if (isLoadEnable) {
+            viewLoadContainer.setVisibility(VISIBLE);
+        } else {
+            viewLoadContainer.setVisibility(GONE);
+        }
+    }
+
+    /**
+     * 设置自动加载更多开关，默认开启
+     *
+     * @param isAutoLoad
+     */
+    public void setAutoLoad(boolean isAutoLoad) {
+        this.isAutoLoad = isAutoLoad;
     }
 
     /**
@@ -129,11 +155,8 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
      * @param colors
      */
     public void setColorSchemeColors(@ColorInt int... colors) {
-        if (viewRefresh instanceof DefaultView) {
-            ((DefaultView) viewRefresh).setColorSchemeColors(colors);
-        }
-        if (viewLoad instanceof DefaultView) {
-            ((DefaultView) viewLoad).setColorSchemeColors(colors);
+        if (viewRefresh instanceof DefaultRefreshView) {
+            ((DefaultRefreshView) viewRefresh).setColorSchemeColors(colors);
         }
     }
 
@@ -152,11 +175,8 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
      * @param color
      */
     public void setProgressBackgroundColorSchemeColor(@ColorInt int color) {
-        if (viewRefresh instanceof DefaultView) {
-            ((DefaultView)viewRefresh).setBackgroundColor(color);
-        }
-        if (viewLoad instanceof DefaultView) {
-            ((DefaultView)viewLoad).setBackgroundColor(color);
+        if (viewRefresh instanceof DefaultRefreshView) {
+            ((DefaultRefreshView) viewRefresh).setBackgroundColor(color);
         }
     }
 
@@ -176,6 +196,9 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
      */
     public void setOnLoadListener(OnLoadListener listener) {
         loadListener = listener;
+        this.isLoadEnable = true;
+        setAutoLoad(true);
+        viewLoadContainer.setVisibility(VISIBLE);
     }
 
     /**
@@ -243,9 +266,7 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
         if (getChildCount() == 0) {
             return;
         }
-        if (viewTarget == null) {
-            ensureTarget();
-        }
+        ensureTarget();
         if (viewTarget == null) {
             return;
         }
@@ -258,14 +279,14 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
 
         viewRefreshContainer.layout(0, -viewContentHeight / 2, width, viewContentHeight / 2);
         viewLoadContainer.layout(0, height - viewContentHeight / 2, width, height + viewContentHeight / 2);
+
+
     }
 
     @Override
     public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        if (viewTarget == null) {
-            ensureTarget();
-        }
+        ensureTarget();
         if (viewTarget == null) {
             return;
         }
@@ -280,15 +301,51 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
                 MeasureSpec.makeMeasureSpec(viewContentHeight, MeasureSpec.EXACTLY));
     }
 
+    private void onScroll() {
+        if (!canChildScrollUp() && isAutoLoad && isLoadEnable && !isLoading && isPullingUp && !isTouchDown) {
+            animateToLoad();
+        }
+    }
+
     private void ensureTarget() {
         if (viewTarget == null) {
             for (int i = 0; i < getChildCount(); i++) {
                 View child = getChildAt(i);
                 if (!child.equals(viewRefreshContainer) && !child.equals(viewLoadContainer)) {
                     viewTarget = child;
+                    setScrollListener();
                     break;
                 }
             }
+        }
+    }
+
+    private void setScrollListener() {
+        if (viewTarget instanceof ListView) {
+            ((ListView) viewTarget).setOnScrollListener(new AbsListView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(AbsListView view, int scrollState) {
+                }
+
+                @Override
+                public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                    RefreshLayout.this.onScroll();
+                }
+            });
+        }
+        if (viewTarget instanceof RecyclerView) {
+            ((RecyclerView) viewTarget).addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    super.onScrollStateChanged(recyclerView, newState);
+                }
+
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    onScroll();
+                }
+            });
         }
     }
 
@@ -302,20 +359,25 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
         }
         switch (ev.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
+                isTouchDown = true;
                 isDraging = false;
                 downY = ev.getY();
                 break;
             case MotionEvent.ACTION_MOVE:
                 final float y = ev.getY();
                 float yDiff = y - downY;
+                if (downY > y) isPullingUp = true;
                 if (yDiff > mTouchSlop && !canChildScrollDown()) {
                     isDragDown = true;
                     isDraging = true;
                 }
-                if (yDiff < -mTouchSlop && !canChildScrollUp()) {
+                if (yDiff < -mTouchSlop && !canChildScrollUp() && isLoadEnable) {
                     isDragDown = false;
                     isDraging = true;
                 }
+                break;
+            case MotionEvent.ACTION_UP:
+                isTouchDown = false;
                 break;
         }
         return isDraging;
@@ -403,6 +465,7 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
     @Override
     public void onNestedScrollAccepted(View child, View target, int axes) {
         super.onNestedScrollAccepted(child, target, axes);
+        isTouchDown = true;
         startNestedScroll(axes & ViewCompat.SCROLL_AXIS_VERTICAL);
         nestedOverScroll = 0;
         isNestedScrolling = true;
@@ -417,6 +480,8 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
     public void onStopNestedScroll(View target) {
         super.onStopNestedScroll(target);
         isNestedScrolling = false;
+        isTouchDown = false;
+        Log.d("onStopNestedScroll", "onStopNestedScroll");
         onTouchUp();
         nestedOverScroll = 0;
         stopNestedScroll();
@@ -424,6 +489,7 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
 
     @Override
     public void onNestedPreScroll(View target, int dx, int dy, int[] consumed) {
+        if (dy > 0) isPullingUp = true;
         if (nestedOverScroll > 0 && dy > 0 || nestedOverScroll < 0 && dy < 0) {
             nestedOverScroll -= dy;
             consumed[1] = dy;
@@ -482,6 +548,7 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
     }
 
     private void onTouchUp() {
+        if (overScroll == 0) return;
         if (overScroll > 0) {
             if (overScroll > refreshMidHeight) {
                 animateToRefresh();
@@ -523,8 +590,10 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
                     }
                 }
             });
+            animatorToRefresh.setDuration(animateDuration);
+        } else {
+            animatorToRefresh.setFloatValues(Math.abs(overScroll), refreshHeight);
         }
-        animatorToRefresh.setDuration(animateDuration);
         animatorToRefresh.start();
     }
 
@@ -554,9 +623,12 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
                     }
                 }
             });
+            animatorToLoad.setDuration(animateDuration);
+        } else {
+            animatorToLoad.setFloatValues(overScroll, -loadHeight);
         }
-        animatorToLoad.setDuration(animateDuration);
         animatorToLoad.start();
+        isPullingUp = false;
     }
 
     /**
@@ -581,8 +653,10 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
                     }
                 }
             });
+            animatorToRefreshReset.setDuration(animateDuration);
+        } else {
+            animatorToRefreshReset.setFloatValues(Math.abs(overScroll), 0);
         }
-        animatorToRefreshReset.setDuration(animateDuration);
         animatorToRefreshReset.start();
     }
 
@@ -608,8 +682,10 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
                     }
                 }
             });
+            animatorToLoadReset.setDuration(animateDuration);
+        } else {
+            animatorToLoadReset.setFloatValues(overScroll, 0);
         }
-        animatorToLoadReset.setDuration(animateDuration);
         animatorToLoadReset.start();
     }
 

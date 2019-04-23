@@ -5,29 +5,35 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.CircularProgressDrawable;
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
-import android.view.View;
+import android.view.Gravity;
+import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
-import com.zhangxq.refreshlayout.R;
 import com.zhangxq.refreshlayout.RefreshView;
 
 /**
  * Created by zhangxiaoqi on 2019/4/22.
  */
 
-public class DefaultView extends RefreshView {
+public class DefaultRefreshView extends RefreshView {
     private CircleImageView imageView;
     private CircularProgressDrawable mProgress;
 
-    public DefaultView(Context context) {
+    public DefaultRefreshView(Context context) {
         this(context, null);
     }
 
-    public DefaultView(Context context, @Nullable AttributeSet attrs) {
+    public DefaultRefreshView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        View view = LayoutInflater.from(context).inflate(R.layout.view_default, null);
-        addView(view);
-        imageView = view.findViewById(R.id.viewCircle);
+        RelativeLayout container = new RelativeLayout(context);
+        container.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        addView(container);
+        imageView = new CircleImageView(context);
+        container.setGravity(Gravity.CENTER);
+        container.addView(imageView);
+        final float density = getContext().getResources().getDisplayMetrics().density;
+        imageView.getLayoutParams().width = (int) (40 * density);
+        imageView.getLayoutParams().height = (int) (40 * density);
 
         mProgress = new CircularProgressDrawable(getContext());
         mProgress.setStyle(CircularProgressDrawable.DEFAULT);
@@ -70,7 +76,7 @@ public class DefaultView extends RefreshView {
 
     private void moveSpinner(float overscrollTop, float distanceToRefresh, float totalDragDistance) {
         mProgress.setArrowEnabled(true);
-        totalDragDistance = totalDragDistance / 2;
+        totalDragDistance = totalDragDistance / 5;
         final float density = getContext().getResources().getDisplayMetrics().density;
         float originalDragPercent = overscrollTop / totalDragDistance;
         float dragPercent = Math.min(1f, Math.abs(originalDragPercent));

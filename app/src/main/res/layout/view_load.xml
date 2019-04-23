@@ -18,13 +18,5 @@
             android:gravity="center"
             android:minHeight="20dp"
             android:text="加载更多" />
-
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="10dp"
-            android:layout_toLeftOf="@+id/tvContent" />
     </RelativeLayout>
 </RelativeLayout>

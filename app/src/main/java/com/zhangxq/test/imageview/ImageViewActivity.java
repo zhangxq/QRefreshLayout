@@ -34,7 +34,7 @@ public class ImageViewActivity extends AppCompatActivity implements RefreshLayou
             public void run() {
                 refreshLayout.setRefreshing(false);
             }
-        }, 10000);
+        }, 5000);
     }
 
     @Override
