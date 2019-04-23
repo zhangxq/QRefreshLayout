@@ -11,7 +11,6 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ListViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -486,7 +485,6 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
         super.onStopNestedScroll(target);
         isNestedScrolling = false;
         isTouchDown = false;
-        Log.d("onStopNestedScroll", "onStopNestedScroll");
         onTouchUp();
         nestedOverScroll = 0;
         stopNestedScroll();
