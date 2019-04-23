@@ -21,5 +21,6 @@
         <activity android:name=".recyclerview.RecyclerViewActivity" />
         <activity android:name=".coordinatorlayout.CoordinatorLayoutActivity" />
         <activity android:name=".swiperefreshlayout.SwipeRefreshLayoutActivity" />
+        <activity android:name=".nestedscrollview.NestScrollViewActivity" />
     </application>
 </manifest>

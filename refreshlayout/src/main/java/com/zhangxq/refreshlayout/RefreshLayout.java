@@ -271,6 +271,11 @@ public class RefreshLayout extends ViewGroup implements NestedScrollingParent, N
             return;
         }
         final View child = viewTarget;
+        if (child.getBackground() == null) {
+            child.setBackgroundColor(0xffffffff);
+        } else {
+            child.getBackground().setAlpha(255);
+        }
         final int childLeft = getPaddingLeft();
         final int childTop = getPaddingTop();
         final int childWidth = width - getPaddingLeft() - getPaddingRight();

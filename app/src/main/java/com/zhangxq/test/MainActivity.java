@@ -9,6 +9,7 @@ import android.view.View;
 import com.zhangxq.test.coordinatorlayout.CoordinatorLayoutActivity;
 import com.zhangxq.test.imageview.ImageViewActivity;
 import com.zhangxq.test.listview.ListViewActivity;
+import com.zhangxq.test.nestedscrollview.NestScrollViewActivity;
 import com.zhangxq.test.recyclerview.RecyclerViewActivity;
 import com.zhangxq.test.swiperefreshlayout.SwipeRefreshLayoutActivity;
 
@@ -54,6 +55,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, CoordinatorLayoutActivity.class);
+                startActivity(intent);
+            }
+        });
+        findViewById(R.id.btnNestedScroll).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, NestScrollViewActivity.class);
                 startActivity(intent);
             }
         });
