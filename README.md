@@ -25,7 +25,7 @@ dependencies {
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.zhangxq.refreshlayout.RefreshLayout
+    <com.zhangxq.refreshlayout.QRefreshLayout
         android:id="@+id/refreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
