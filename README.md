@@ -15,7 +15,7 @@ allprojects {
 ```
 ```
 dependencies {
-  implementation 'com.github.zhangxq:QRefreshLayout:1.0.2'
+  implementation 'com.github.zhangxq:QRefreshLayout:1.0.3'
 }
 ```
 ```
@@ -54,6 +54,7 @@ refreshLayout.setOnLoadListener(this);
 | setLoadView | 设置加载更多view |
 | setLoadEnable | 设置加载更多开关， setOnLoadListener调用后默认开启 |
 | setAutoLoad  |  设置自动加载更多开关，setOnLoadListener调用后默认开启 |
+|setListViewScrollListener|设置ListView的滚动监听器（由于需要做自动加更多，所以占用了监听器，在这里回调回来）|
 ### 自定义下拉刷新和加载更多view
 setRefreshView 和 setLoadView 两个方法用于接收用户自定义的下拉刷新和加载更多动画view，参数都是接收一个继承自RefreshView的子类，RefreshView实现了一个Refresh接口，代码如下：
 ```
