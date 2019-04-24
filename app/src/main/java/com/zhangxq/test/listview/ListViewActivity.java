@@ -40,7 +40,6 @@ public class ListViewActivity extends AppCompatActivity implements QRefreshLayou
         qRefreshLayout.setOnLoadListener(this);
         qRefreshLayout.setRefreshView(new MyRefreshView(this));
         qRefreshLayout.setLoadView(new MyLoadView(this));
-        qRefreshLayout.setAutoLoad(false);
 
         listView = findViewById(R.id.listView);
         listView.setOnItemClickListener(this);
@@ -73,7 +72,7 @@ public class ListViewActivity extends AppCompatActivity implements QRefreshLayou
                 down();
                 qRefreshLayout.setRefreshing(false);
             }
-        }, 5000);
+        }, 1000);
     }
 
     @Override
@@ -81,7 +80,7 @@ public class ListViewActivity extends AppCompatActivity implements QRefreshLayou
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-//                up();
+                up();
                 qRefreshLayout.setLoading(false);
             }
         }, 1000);

@@ -1,5 +1,6 @@
 package com.zhangxq.refreshlayout;
 
+import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.support.annotation.ColorInt;
@@ -38,11 +39,7 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
     // 滑动事件相关参数
     private float lastMoveY; // 上次移动到的位置y
     private float overScroll; // 上拉和下拉的距离
-    //    private boolean isDraging; // 是否开始滑动
     private int dragMode; // 拖动模式
-    private int lastDragMode; // 上次操作的拖动模式
-    //    private boolean isDragDown; // 是否是下拉
-//    private int mTouchSlop; // 滑动最小阈值
     private final float dragRate = 0.5f; // 滑动速率
 
     // 刷新逻辑控制参数
@@ -85,7 +82,6 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
 
     public QRefreshLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
-//        mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
         setNestedScrollingEnabled(true);
 
         viewRefresh = new DefaultRefreshView(context);
@@ -219,6 +215,7 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
                 animateToRefresh();
             }
         } else {
+            isRefreshing = false;
             if (overScroll >= 0) {
                 animateToRefreshReset();
             }
@@ -246,6 +243,7 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
                 animateToLoad();
             }
         } else {
+            isLoading = false;
             if (overScroll <= 0) {
                 animateToLoadReset();
             }
@@ -365,8 +363,8 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
         switch (ev.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
                 isTouchDown = true;
-                dragMode = 0;
                 lastMoveY = ev.getY();
+                dragMode = 0;
                 break;
             case MotionEvent.ACTION_MOVE:
                 final float y = ev.getY();
@@ -387,6 +385,9 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
                             dragMode = N_UP;
                         }
                     }
+                }
+                if (dragMode != 0) {
+                    lastMoveY = ev.getY();
                 }
                 break;
             case MotionEvent.ACTION_UP:
@@ -422,7 +423,9 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
                         }
                         viewRefreshContainer.setTranslationY(overScroll / 2);
                         viewTarget.setTranslationY(overScroll);
-                        viewRefresh.setHeight(overScroll, refreshMidHeight, viewContentHeight);
+                        if (!isRefreshing) {
+                            viewRefresh.setHeight(overScroll, refreshMidHeight, viewContentHeight);
+                        }
                         if (!isRefreshing) {
                             if (overScroll > refreshMidHeight) {
                                 viewRefresh.setRefeaseToRefresh();
@@ -443,7 +446,9 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
                         }
                         viewLoadContainer.setTranslationY(overScroll / 2);
                         viewTarget.setTranslationY(overScroll);
-                        viewLoad.setHeight(Math.abs(overScroll), loadMidHeight, viewContentHeight);
+                        if (!isLoading) {
+                            viewLoad.setHeight(Math.abs(overScroll), loadMidHeight, viewContentHeight);
+                        }
                         if (!isLoading) {
                             if (overScroll < -loadMidHeight) {
                                 viewLoad.setRefeaseToRefresh();
@@ -477,7 +482,6 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
                 onTouchUp();
-                lastDragMode = dragMode;
                 dragMode = 0;
                 return false;
         }
@@ -572,7 +576,7 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
             if (overScroll < -viewContentHeight / 2) {
                 overScroll = -viewContentHeight / 2;
             }
-            viewLoad.setTranslationY(overScroll / 2);
+            viewLoadContainer.setTranslationY(overScroll / 2);
             viewTarget.setTranslationY(overScroll);
             viewLoad.setHeight(Math.abs(overScroll), loadMidHeight, viewContentHeight / 2);
             if (overScroll < -loadMidHeight) {
@@ -608,7 +612,8 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
      * 动画移动到刷新位置
      */
     private void animateToRefresh() {
-        cancelAnimators();
+        if (isAnimating) return;
+        isAnimating = true;
         if (animatorToRefresh == null) {
             animatorToRefresh = ValueAnimator.ofFloat(Math.abs(overScroll), refreshHeight);
             animatorToRefresh.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -617,7 +622,9 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
                     float height = (float) animation.getAnimatedValue();
                     overScroll = height;
                     viewRefreshContainer.setTranslationY(overScroll / 2);
-                    viewRefresh.setHeight(overScroll, refreshMidHeight, viewContentHeight / 2);
+                    if (!isRefreshing) {
+                        viewRefresh.setHeight(overScroll, refreshMidHeight, viewContentHeight / 2);
+                    }
                     viewTarget.setTranslationY(overScroll);
                     if (height == refreshHeight) {
                         if (!isRefreshing) {
@@ -636,14 +643,14 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
             animatorToRefresh.setFloatValues(Math.abs(overScroll), refreshHeight);
         }
         animatorToRefresh.start();
-        isAnimating = true;
     }
 
     /**
      * 动画移动到加载更多位置
      */
     private void animateToLoad() {
-        cancelAnimators();
+        if (isAnimating) return;
+        isAnimating = true;
         if (animatorToLoad == null) {
             animatorToLoad = ValueAnimator.ofFloat(overScroll, -loadHeight);
             animatorToLoad.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -652,7 +659,9 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
                     float height = (float) animation.getAnimatedValue();
                     overScroll = height;
                     viewLoadContainer.setTranslationY(overScroll / 2);
-                    viewLoad.setHeight(Math.abs(overScroll), loadMidHeight, viewContentHeight / 2);
+                    if (!isLoading) {
+                        viewLoad.setHeight(Math.abs(overScroll), loadMidHeight, viewContentHeight / 2);
+                    }
                     viewTarget.setTranslationY(overScroll);
                     if (height == -loadHeight) {
                         if (!isLoading) {
@@ -671,7 +680,6 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
             animatorToLoad.setFloatValues(overScroll, -loadHeight);
         }
         animatorToLoad.start();
-        isAnimating = true;
         isPullingUp = false;
     }
 
@@ -682,7 +690,8 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
         if (overScroll == 0) {
             isRefreshing = false;
         } else {
-            cancelAnimators();
+            if (isAnimating) return;
+            isAnimating = true;
             if (animatorToRefreshReset == null) {
                 animatorToRefreshReset = ValueAnimator.ofFloat(Math.abs(overScroll), 0);
                 animatorToRefreshReset.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -704,7 +713,6 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
                 animatorToRefreshReset.setFloatValues(Math.abs(overScroll), 0);
             }
             animatorToRefreshReset.start();
-            isAnimating = true;
         }
     }
 
@@ -715,7 +723,8 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
         if (overScroll == 0) {
             isLoading = false;
         } else {
-            cancelAnimators();
+            if (isAnimating) return;
+            isAnimating = true;
             if (animatorToLoadReset == null) {
                 animatorToLoadReset = ValueAnimator.ofFloat(overScroll, 0);
                 animatorToLoadReset.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -737,22 +746,17 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
                 animatorToLoadReset.setFloatValues(overScroll, 0);
             }
             animatorToLoadReset.start();
-            isAnimating = true;
         }
-    }
-
-    private void cancelAnimators() {
-        if (animatorToRefresh != null) animatorToRefresh.cancel();
-        if (animatorToRefreshReset != null) animatorToRefreshReset.cancel();
-        if (animatorToLoad != null) animatorToLoad.cancel();
-        if (animatorToLoadReset != null) animatorToLoadReset.cancel();
     }
 
     /**
      * 全部恢复到初始位置
      */
     private void reset() {
-        cancelAnimators();
+        if (animatorToRefresh != null) animatorToRefresh.cancel();
+        if (animatorToRefreshReset != null) animatorToRefreshReset.cancel();
+        if (animatorToLoad != null) animatorToLoad.cancel();
+        if (animatorToLoadReset != null) animatorToLoadReset.cancel();
         viewRefreshContainer.setTranslationY(0);
         viewLoadContainer.setTranslationY(0);
         viewTarget.setTranslationY(0);

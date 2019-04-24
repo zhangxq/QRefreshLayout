@@ -47,13 +47,8 @@ public class DefaultLoadView extends RefreshView {
     }
 
     @Override
-    protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        super.onLayout(changed, l, t, r, b);
-    }
-
-    @Override
     public void setHeight(float dragDistance, float distanceToRefresh, float totalDistance) {
-        progressBar.setVisibility(GONE);
+
     }
 
     @Override
@@ -64,11 +59,13 @@ public class DefaultLoadView extends RefreshView {
 
     @Override
     public void setPullToRefresh() {
+        progressBar.setVisibility(GONE);
         tvContent.setText("上拉加载更多");
     }
 
     @Override
     public void setRefeaseToRefresh() {
+        progressBar.setVisibility(GONE);
         tvContent.setText("释放加载更多");
     }
 }

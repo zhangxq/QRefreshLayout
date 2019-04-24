@@ -39,10 +39,12 @@ public class DefaultRefreshView extends RefreshView {
         mProgress.setStyle(CircularProgressDrawable.DEFAULT);
         imageView.setImageDrawable(mProgress);
         mProgress.setArrowEnabled(true);
+        mProgress.stop();
     }
 
     @Override
     public void setHeight(float dragDistance, float distanceToRefresh, float totalDistance) {
+        mProgress.stop();
         moveSpinner(dragDistance, distanceToRefresh, totalDistance);
     }
 
@@ -56,12 +58,10 @@ public class DefaultRefreshView extends RefreshView {
 
     @Override
     public void setPullToRefresh() {
-        mProgress.stop();
     }
 
     @Override
     public void setRefeaseToRefresh() {
-        mProgress.stop();
     }
 
     public void setColorSchemeColors(@ColorInt int... colors) {
@@ -75,7 +75,7 @@ public class DefaultRefreshView extends RefreshView {
 
     private void moveSpinner(float overscrollTop, float distanceToRefresh, float totalDragDistance) {
         mProgress.setArrowEnabled(true);
-        totalDragDistance = totalDragDistance / 5;
+        totalDragDistance = totalDragDistance / 10;
         final float density = getContext().getResources().getDisplayMetrics().density;
         float originalDragPercent = overscrollTop / totalDragDistance;
         float dragPercent = Math.min(1f, Math.abs(originalDragPercent));
