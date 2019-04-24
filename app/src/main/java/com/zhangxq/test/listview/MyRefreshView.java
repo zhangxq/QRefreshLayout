@@ -17,6 +17,7 @@ import com.zhangxq.test.R;
 
 public class MyRefreshView extends RefreshView {
     private TextView tvContent;
+    private TextView tvHeight;
     private View viewContent;
     private ProgressBar progressBar;
 
@@ -29,12 +30,13 @@ public class MyRefreshView extends RefreshView {
         viewContent = LayoutInflater.from(context).inflate(R.layout.view_refresh, null);
         addView(viewContent);
         tvContent = viewContent.findViewById(R.id.tvContent);
+        tvHeight = viewContent.findViewById(R.id.tvHeight);
         progressBar = viewContent.findViewById(R.id.progressBar);
     }
 
     @Override
     public void setHeight(float dragDistance, float distanceToRefresh, float totalDistance) {
-
+        tvHeight.setText((int) dragDistance + ":" + (int) distanceToRefresh + ":" + (int) totalDistance);
     }
 
     @Override

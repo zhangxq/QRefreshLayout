@@ -18,6 +18,13 @@
             android:gravity="center"
             android:text="下拉刷新" />
 
+        <TextView
+            android:id="@+id/tvHeight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true" />
+
         <ProgressBar
             android:id="@+id/progressBar"
             android:layout_width="20dp"
