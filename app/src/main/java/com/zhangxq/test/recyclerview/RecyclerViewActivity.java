@@ -23,7 +23,7 @@ import java.util.List;
 
 public class RecyclerViewActivity extends AppCompatActivity implements QRefreshLayout.OnRefreshListener, QRefreshLayout.OnLoadListener {
     private RecyclerView recyclerView;
-    private QRefreshLayout QRefreshLayout;
+    private QRefreshLayout qRefreshLayout;
 
     private List<String> datas = new ArrayList<>();
     private RecyclerAdapter adapter;
@@ -33,14 +33,14 @@ public class RecyclerViewActivity extends AppCompatActivity implements QRefreshL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recyclerview);
         recyclerView = findViewById(R.id.recyclerView);
-        QRefreshLayout = findViewById(R.id.refreshLayout);
-        QRefreshLayout.setOnRefreshListener(this);
-        QRefreshLayout.setOnLoadListener(this);
+        qRefreshLayout = findViewById(R.id.refreshLayout);
+        qRefreshLayout.setOnRefreshListener(this);
+        qRefreshLayout.setOnLoadListener(this);
+        qRefreshLayout.setRefreshing(true);
 
         adapter = new RecyclerAdapter();
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
-        down();
     }
 
     private void down() {
@@ -65,7 +65,7 @@ public class RecyclerViewActivity extends AppCompatActivity implements QRefreshL
             @Override
             public void run() {
                 down();
-                QRefreshLayout.setRefreshing(false);
+                qRefreshLayout.setRefreshing(false);
             }
         }, 1000);
     }
@@ -76,7 +76,7 @@ public class RecyclerViewActivity extends AppCompatActivity implements QRefreshL
             @Override
             public void run() {
                 up();
-                QRefreshLayout.setLoading(false);
+                qRefreshLayout.setLoading(false);
             }
         }, 1000);
     }

@@ -35,11 +35,11 @@ public class PageFragment extends Fragment implements QRefreshLayout.OnRefreshLi
         qRefreshLayout = view.findViewById(R.id.refreshLayout);
         qRefreshLayout.setOnRefreshListener(this);
         qRefreshLayout.setOnLoadListener(this);
+        qRefreshLayout.setRefreshing(true);
 
         adapter = new RecyclerAdapter();
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(adapter);
-        down();
         return view;
     }
 

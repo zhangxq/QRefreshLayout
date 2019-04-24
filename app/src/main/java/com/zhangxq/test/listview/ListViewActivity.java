@@ -40,12 +40,12 @@ public class ListViewActivity extends AppCompatActivity implements QRefreshLayou
         qRefreshLayout.setOnLoadListener(this);
         qRefreshLayout.setRefreshView(new MyRefreshView(this));
         qRefreshLayout.setLoadView(new MyLoadView(this));
+        qRefreshLayout.setRefreshing(true);
 
         listView = findViewById(R.id.listView);
         listView.setOnItemClickListener(this);
         adapter = new ListAdapter();
         listView.setAdapter(adapter);
-        down();
     }
 
     private void down() {

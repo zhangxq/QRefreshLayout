@@ -94,6 +94,7 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
         viewLoadContainer.setVisibility(GONE);
         addView(viewRefreshContainer);
         addView(viewLoadContainer);
+        ensureTarget();
     }
 
     public void setLoadEnable(boolean isEnable) {
@@ -208,6 +209,7 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
      * @param refreshing
      */
     public void setRefreshing(boolean refreshing) {
+        ensureTarget();
         if (refreshing) {
             if (isRefreshing || isLoading || dragMode != 0) return;
             if (!isRefreshing) {
@@ -236,6 +238,8 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
      * @param loading
      */
     public void setLoading(boolean loading) {
+        if (!isLoadEnable) return;
+        ensureTarget();
         if (loading) {
             if (isLoading || isRefreshing || dragMode != 0) return;
             if (!isLoading) {
@@ -587,6 +591,7 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
                 viewRefresh.setPullToRefresh();
             }
         } else {
+            if (!isLoadEnable) return;
             if (overScroll < -viewContentHeight / 2) {
                 overScroll = -viewContentHeight / 2;
             }
@@ -612,6 +617,7 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
                 }
             }
         } else {
+            if (!isLoadEnable) return;
             if (overScroll < -loadMidHeight) {
                 animateToLoad();
             } else {
