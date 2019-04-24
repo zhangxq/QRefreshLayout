@@ -21,6 +21,7 @@ public class NestScrollViewActivity extends AppCompatActivity implements QRefres
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nestedscrollview);
+        setTitle("NestScrollView示例");
         qRefreshLayout = findViewById(R.id.refreshLayout);
         qRefreshLayout.setOnRefreshListener(this);
         qRefreshLayout.setOnLoadListener(this);

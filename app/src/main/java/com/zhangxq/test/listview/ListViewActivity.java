@@ -34,6 +34,7 @@ public class ListViewActivity extends AppCompatActivity implements QRefreshLayou
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_listview);
+        setTitle("ListView示例");
         qRefreshLayout = findViewById(R.id.refreshLayout);
 
         qRefreshLayout.setOnRefreshListener(this);

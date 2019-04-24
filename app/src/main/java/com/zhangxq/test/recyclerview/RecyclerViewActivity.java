@@ -32,6 +32,7 @@ public class RecyclerViewActivity extends AppCompatActivity implements QRefreshL
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recyclerview);
+        setTitle("RecyclerView示例");
         recyclerView = findViewById(R.id.recyclerView);
         qRefreshLayout = findViewById(R.id.refreshLayout);
         qRefreshLayout.setOnRefreshListener(this);

@@ -26,7 +26,7 @@ public class CoordinatorLayoutActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_coordinatorlayout);
-
+        setTitle("CoordinatorLayout示例");
         viewPager = findViewById(R.id.viewPager);
         tabLayout = findViewById(R.id.tabLayout);
         adapter = new PagerAdapter(getSupportFragmentManager());

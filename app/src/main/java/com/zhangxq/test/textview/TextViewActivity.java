@@ -1,7 +1,6 @@
 package com.zhangxq.test.textview;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
@@ -22,6 +21,7 @@ public class TextViewActivity extends AppCompatActivity implements QRefreshLayou
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_textview);
+        setTitle("TextView示例");
         refreshLayout = findViewById(R.id.refreshLayout);
         refreshLayout.setOnRefreshListener(this);
         textView = findViewById(R.id.textView);

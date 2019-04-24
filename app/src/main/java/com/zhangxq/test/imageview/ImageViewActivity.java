@@ -22,6 +22,7 @@ public class ImageViewActivity extends AppCompatActivity implements QRefreshLayo
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_imageview);
+        setTitle("ImageView示例");
         qRefreshLayout = findViewById(R.id.refreshLayout);
         qRefreshLayout.setOnRefreshListener(this);
         qRefreshLayout.setOnLoadListener(this);
