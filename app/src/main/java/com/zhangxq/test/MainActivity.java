@@ -12,6 +12,7 @@ import com.zhangxq.test.listview.ListViewActivity;
 import com.zhangxq.test.nestedscrollview.NestScrollViewActivity;
 import com.zhangxq.test.recyclerview.RecyclerViewActivity;
 import com.zhangxq.test.swiperefreshlayout.SwipeRefreshLayoutActivity;
+import com.zhangxq.test.textview.TextViewActivity;
 
 /**
  * Created by zhangxiaoqi on 2019/4/18.
@@ -48,6 +49,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, ImageViewActivity.class);
+                startActivity(intent);
+            }
+        });
+        findViewById(R.id.btnTextView).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, TextViewActivity.class);
                 startActivity(intent);
             }
         });

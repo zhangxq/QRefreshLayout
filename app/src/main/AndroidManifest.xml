@@ -22,5 +22,6 @@
         <activity android:name=".coordinatorlayout.CoordinatorLayoutActivity" />
         <activity android:name=".swiperefreshlayout.SwipeRefreshLayoutActivity" />
         <activity android:name=".nestedscrollview.NestScrollViewActivity" />
+        <activity android:name=".textview.TextViewActivity" />
     </application>
 </manifest>
