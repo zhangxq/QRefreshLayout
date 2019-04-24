@@ -6,39 +6,39 @@
     android:padding="10dp">
 
     <Button
-        android:id="@+id/btnOld"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:text="SwipeRefreshLayout官方示例" />
-
-    <Button
         android:id="@+id/btnList"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:text="ListView示例" />
+        android:text="_ListView示例" />
 
     <Button
         android:id="@+id/btnRecycler"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:text="RecyclerView示例" />
+        android:text="_RecyclerView示例" />
 
     <Button
         android:id="@+id/btnImage"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:text="ImageView示例" />
+        android:text=" ImageView示例" />
 
     <Button
         android:id="@+id/btnCoordinator"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:text="CoordinatorLayout示例" />
+        android:text=" CoordinatorLayout示例" />
 
     <Button
         android:id="@+id/btnNestedScroll"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:text="NestedScrollView示例" />
+        android:text=" NestedScrollView示例" />
+
+    <Button
+        android:id="@+id/btnOld"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text=" SwipeRefreshLayout官方示例" />
 
 </LinearLayout>
