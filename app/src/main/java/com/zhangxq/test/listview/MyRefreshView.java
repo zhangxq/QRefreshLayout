@@ -34,7 +34,7 @@ public class MyRefreshView extends RefreshView {
 
     @Override
     public void setHeight(float dragDistance, float distanceToRefresh, float totalDistance) {
-        progressBar.setVisibility(GONE);
+
     }
 
     @Override
@@ -45,11 +45,13 @@ public class MyRefreshView extends RefreshView {
 
     @Override
     public void setPullToRefresh() {
+        progressBar.setVisibility(GONE);
         tvContent.setText("下拉刷新");
     }
 
     @Override
     public void setRefeaseToRefresh() {
+        progressBar.setVisibility(GONE);
         tvContent.setText("释放刷新");
     }
 }

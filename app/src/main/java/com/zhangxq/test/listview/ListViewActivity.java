@@ -28,18 +28,19 @@ public class ListViewActivity extends AppCompatActivity implements QRefreshLayou
     private ListView listView;
     private ListAdapter adapter;
     private List<String> datas = new ArrayList<>();
-    private QRefreshLayout QRefreshLayout;
+    private QRefreshLayout qRefreshLayout;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_listview);
-        QRefreshLayout = findViewById(R.id.refreshLayout);
+        qRefreshLayout = findViewById(R.id.refreshLayout);
 
-        QRefreshLayout.setOnRefreshListener(this);
-        QRefreshLayout.setOnLoadListener(this);
-        QRefreshLayout.setRefreshView(new MyRefreshView(this));
-        QRefreshLayout.setLoadView(new MyLoadView(this));
+        qRefreshLayout.setOnRefreshListener(this);
+        qRefreshLayout.setOnLoadListener(this);
+        qRefreshLayout.setRefreshView(new MyRefreshView(this));
+        qRefreshLayout.setLoadView(new MyLoadView(this));
+        qRefreshLayout.setAutoLoad(false);
 
         listView = findViewById(R.id.listView);
         listView.setOnItemClickListener(this);
@@ -70,9 +71,9 @@ public class ListViewActivity extends AppCompatActivity implements QRefreshLayou
             @Override
             public void run() {
                 down();
-                QRefreshLayout.setRefreshing(false);
+                qRefreshLayout.setRefreshing(false);
             }
-        }, 1000);
+        }, 5000);
     }
 
     @Override
@@ -80,8 +81,8 @@ public class ListViewActivity extends AppCompatActivity implements QRefreshLayou
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                up();
-                QRefreshLayout.setLoading(false);
+//                up();
+                qRefreshLayout.setLoading(false);
             }
         }, 1000);
     }

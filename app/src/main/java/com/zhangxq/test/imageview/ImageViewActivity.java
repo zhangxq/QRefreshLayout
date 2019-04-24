@@ -15,18 +15,18 @@ import com.zhangxq.test.R;
  */
 
 public class ImageViewActivity extends AppCompatActivity implements QRefreshLayout.OnRefreshListener, QRefreshLayout.OnLoadListener {
-    private QRefreshLayout QRefreshLayout;
+    private QRefreshLayout qRefreshLayout;
     private ImageView imageView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_imageview);
-        QRefreshLayout = findViewById(R.id.refreshLayout);
-        QRefreshLayout.setOnRefreshListener(this);
-        QRefreshLayout.setOnLoadListener(this);
-        QRefreshLayout.setColorSchemeColors(0xffff0000, 0xff00ff00, 0xff0000ff);
-        QRefreshLayout.setProgressBackgroundColorSchemeColor(0xffabcdef);
+        qRefreshLayout = findViewById(R.id.refreshLayout);
+        qRefreshLayout.setOnRefreshListener(this);
+        qRefreshLayout.setOnLoadListener(this);
+        qRefreshLayout.setColorSchemeColors(0xffff0000, 0xff00ff00, 0xff0000ff);
+        qRefreshLayout.setProgressBackgroundColorSchemeColor(0xffabcdef);
 
         imageView = findViewById(R.id.imageView);
     }
@@ -37,7 +37,7 @@ public class ImageViewActivity extends AppCompatActivity implements QRefreshLayo
             @Override
             public void run() {
                 imageView.setRotationY(imageView.getRotationY() + 180);
-                QRefreshLayout.setRefreshing(false);
+                qRefreshLayout.setRefreshing(false);
             }
         }, 5000);
     }
@@ -48,7 +48,7 @@ public class ImageViewActivity extends AppCompatActivity implements QRefreshLayo
             @Override
             public void run() {
                 imageView.setRotationY(imageView.getRotationY() + 180);
-                QRefreshLayout.setLoading(false);
+                qRefreshLayout.setLoading(false);
             }
         }, 1000);
     }

@@ -11,10 +11,10 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ListViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ListView;
@@ -28,14 +28,21 @@ import com.zhangxq.refreshlayout.defaultview.DefaultRefreshView;
  */
 
 public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, NestedScrollingChild {
+    private static final int N_DOWN = 1; //正常下拉
+    private static final int N_UP = 2; // 正常上拉
+    private static final int R_UP = 3; // 刷新中上拉
+    private static final int L_DOWN = 4; // 加载中下拉
+
     private View viewTarget; // 刷新目标
 
     // 滑动事件相关参数
-    private float downY; // 按下的位置y
+    private float lastMoveY; // 上次移动到的位置y
     private float overScroll; // 上拉和下拉的距离
-    private boolean isDraging; // 是否开始滑动
-    private boolean isDragDown; // 是否是下拉
-    private int mTouchSlop; // 滑动最小阈值
+    //    private boolean isDraging; // 是否开始滑动
+    private int dragMode; // 拖动模式
+    private int lastDragMode; // 上次操作的拖动模式
+    //    private boolean isDragDown; // 是否是下拉
+//    private int mTouchSlop; // 滑动最小阈值
     private final float dragRate = 0.5f; // 滑动速率
 
     // 刷新逻辑控制参数
@@ -50,7 +57,7 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
     private RelativeLayout viewLoadContainer; // 加载更多view容器
     private RefreshView viewRefresh; // 下拉刷新view
     private RefreshView viewLoad; // 加载更多view
-    private final int viewContentHeight = 2000; // 内容区高度
+    private final int viewContentHeight = 2000; // 刷新动画内容区高度
     private final int refreshMidHeight = 170; // 刷新高度，超过这个高度，松手即可刷新
     private final int loadMidHeight = 170; // 加载更多高度，超过这个高度，松手即可加载更多
     private final int refreshHeight = 150; // 刷新动画高度
@@ -78,7 +85,7 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
 
     public QRefreshLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
-        mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
+//        mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
         setNestedScrollingEnabled(true);
 
         viewRefresh = new DefaultRefreshView(context);
@@ -207,15 +214,13 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
      */
     public void setRefreshing(boolean refreshing) {
         if (refreshing) {
-            if (isRefreshing || isLoading || isDraging) return;
+            if (isRefreshing || isLoading || dragMode != 0) return;
             if (!isRefreshing) {
                 animateToRefresh();
             }
         } else {
-            if (isRefreshing) {
-                if (overScroll > 0) {
-                    animateToRefreshReset();
-                }
+            if (overScroll >= 0) {
+                animateToRefreshReset();
             }
         }
     }
@@ -236,15 +241,13 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
      */
     public void setLoading(boolean loading) {
         if (loading) {
-            if (isLoading || isRefreshing || isDraging) return;
+            if (isLoading || isRefreshing || dragMode != 0) return;
             if (!isLoading) {
                 animateToLoad();
             }
         } else {
-            if (isLoading) {
-                if (overScroll < 0) {
-                    animateToLoadReset();
-                }
+            if (overScroll <= 0) {
+                animateToLoadReset();
             }
         }
     }
@@ -317,6 +320,7 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
                 View child = getChildAt(i);
                 if (!child.equals(viewRefreshContainer) && !child.equals(viewLoadContainer)) {
                     viewTarget = child;
+                    viewTarget.setClickable(true);
                     setScrollListener();
                     break;
                 }
@@ -355,98 +359,126 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        if (!isEnabled() || isAnimating || isRefreshing || isLoading || isNestedScrolling) {
+        if (!isEnabled() || isAnimating || isNestedScrolling) {
             return false;
-        }
-        if (isDraging) {
-            return true;
         }
         switch (ev.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
                 isTouchDown = true;
-                isDraging = false;
-                downY = ev.getY();
+                dragMode = 0;
+                lastMoveY = ev.getY();
                 break;
             case MotionEvent.ACTION_MOVE:
                 final float y = ev.getY();
-                float yDiff = y - downY;
-                if (downY > y) isPullingUp = true;
-                if (yDiff > mTouchSlop && !canChildScrollDown()) {
-                    isDragDown = true;
-                    isDraging = true;
-                }
-                if (yDiff < -mTouchSlop && !canChildScrollUp() && isLoadEnable) {
-                    isDragDown = false;
-                    isDraging = true;
-                    downY = y;
+                float yDiff = y - lastMoveY;
+                if (yDiff == 0) return false;
+                if (yDiff < 0) isPullingUp = true;
+                if (yDiff > 0) { // 下拉
+                    if (overScroll < 0 && isLoading) {
+                        dragMode = L_DOWN;
+                    } else if (!canChildScrollDown()) {
+                        dragMode = N_DOWN;
+                    }
+                } else { // 上拉
+                    if (overScroll > 0 && isRefreshing) {
+                        dragMode = R_UP;
+                    } else if (!canChildScrollUp()) {
+                        if (isLoadEnable) {
+                            dragMode = N_UP;
+                        }
+                    }
                 }
                 break;
             case MotionEvent.ACTION_UP:
                 isTouchDown = false;
                 break;
         }
-        return isDraging;
+        return dragMode != 0;
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (!isEnabled() || isAnimating || isRefreshing || isLoading || isNestedScrolling) {
+        if (!isEnabled() || isAnimating || isNestedScrolling) {
             return false;
         }
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
-                isDraging = false;
+                dragMode = 0;
                 break;
             case MotionEvent.ACTION_MOVE:
                 float y = event.getY();
-                if (!isDraging && y > downY) {
-                    isDragDown = true;
+                overScroll += (y - lastMoveY) * dragRate;
+                lastMoveY = y;
+                switch (dragMode) {
+                    case N_DOWN:
+                        if (overScroll < 0) {
+                            overScroll = 0;
+                            viewRefreshContainer.setTranslationY(overScroll);
+                            viewTarget.setTranslationY(overScroll);
+                            return false;
+                        }
+                        if (overScroll > viewContentHeight / 2) {
+                            overScroll = viewContentHeight / 2;
+                        }
+                        viewRefreshContainer.setTranslationY(overScroll / 2);
+                        viewTarget.setTranslationY(overScroll);
+                        viewRefresh.setHeight(overScroll, refreshMidHeight, viewContentHeight);
+                        if (!isRefreshing) {
+                            if (overScroll > refreshMidHeight) {
+                                viewRefresh.setRefeaseToRefresh();
+                            } else {
+                                viewRefresh.setPullToRefresh();
+                            }
+                        }
+                        break;
+                    case N_UP:
+                        if (overScroll > 0) {
+                            overScroll = 0;
+                            viewLoadContainer.setTranslationY(overScroll);
+                            viewTarget.setTranslationY(overScroll);
+                            return false;
+                        }
+                        if (Math.abs(overScroll) > viewContentHeight / 2) {
+                            overScroll = -viewContentHeight / 2;
+                        }
+                        viewLoadContainer.setTranslationY(overScroll / 2);
+                        viewTarget.setTranslationY(overScroll);
+                        viewLoad.setHeight(Math.abs(overScroll), loadMidHeight, viewContentHeight);
+                        if (!isLoading) {
+                            if (overScroll < -loadMidHeight) {
+                                viewLoad.setRefeaseToRefresh();
+                            } else {
+                                viewLoad.setPullToRefresh();
+                            }
+                        }
+                        break;
+                    case R_UP:
+                        if (overScroll < 0) {
+                            overScroll = 0;
+                            viewRefreshContainer.setTranslationY(overScroll);
+                            viewTarget.setTranslationY(overScroll);
+                            return false;
+                        }
+                        viewRefreshContainer.setTranslationY(overScroll / 2);
+                        viewTarget.setTranslationY(overScroll);
+                        break;
+                    case L_DOWN:
+                        if (overScroll > 0) {
+                            overScroll = 0;
+                            viewTarget.setTranslationY(overScroll);
+                            viewLoadContainer.setTranslationY(overScroll);
+                            return false;
+                        }
+                        viewTarget.setTranslationY(overScroll);
+                        viewLoadContainer.setTranslationY(overScroll / 2);
+                        break;
                 }
-                overScroll = (y - downY) * dragRate;
-                if (isDragDown && overScroll < 0 || !isDragDown && overScroll > 0) {
-                    overScroll = 0;
-                    viewRefreshContainer.setTranslationY(overScroll);
-                    viewTarget.setTranslationY(overScroll);
-                    viewLoad.setTranslationY(overScroll);
-                    return false;
-                }
-                if (isDragDown && overScroll >= 0) {
-                    if (overScroll > viewContentHeight / 2) {
-                        overScroll = viewContentHeight / 2;
-                    }
-                    viewRefreshContainer.setTranslationY(overScroll / 2);
-                    viewTarget.setTranslationY(overScroll);
-                }
-                if (!isDragDown && overScroll <= 0) {
-                    if (Math.abs(overScroll) > viewContentHeight / 2) {
-                        overScroll = -viewContentHeight / 2;
-                    }
-                    viewLoad.setTranslationY(overScroll / 2);
-                    viewTarget.setTranslationY(overScroll);
-                }
-
-                if (overScroll > 0) {
-                    viewRefresh.setHeight(overScroll, refreshMidHeight, viewContentHeight / 2);
-                    if (overScroll > refreshMidHeight) {
-                        viewRefresh.setRefeaseToRefresh();
-                    } else {
-                        viewRefresh.setPullToRefresh();
-                    }
-                } else {
-                    viewLoad.setHeight(Math.abs(overScroll), loadMidHeight, viewContentHeight / 2);
-                    if (overScroll < -loadMidHeight) {
-                        viewLoad.setRefeaseToRefresh();
-                    } else {
-                        viewLoad.setPullToRefresh();
-                    }
-                }
-
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
                 onTouchUp();
-                isDraging = false;
-                isDragDown = false;
+                lastDragMode = dragMode;
+                dragMode = 0;
                 return false;
         }
         return true;
@@ -557,13 +589,17 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
             if (overScroll > refreshMidHeight) {
                 animateToRefresh();
             } else {
-                animateToRefreshReset();
+                if (!isRefreshing) {
+                    animateToRefreshReset();
+                }
             }
         } else {
             if (overScroll < -loadMidHeight) {
                 animateToLoad();
             } else {
-                animateToLoadReset();
+                if (!isLoading) {
+                    animateToLoadReset();
+                }
             }
         }
     }
@@ -572,8 +608,7 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
      * 动画移动到刷新位置
      */
     private void animateToRefresh() {
-        if (isAnimating) return;
-        isAnimating = true;
+        cancelAnimators();
         if (animatorToRefresh == null) {
             animatorToRefresh = ValueAnimator.ofFloat(Math.abs(overScroll), refreshHeight);
             animatorToRefresh.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -585,10 +620,12 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
                     viewRefresh.setHeight(overScroll, refreshMidHeight, viewContentHeight / 2);
                     viewTarget.setTranslationY(overScroll);
                     if (height == refreshHeight) {
-                        viewRefresh.setRefresh();
-                        isRefreshing = true;
-                        if (refreshListener != null) {
-                            refreshListener.onRefresh();
+                        if (!isRefreshing) {
+                            viewRefresh.setRefresh();
+                            isRefreshing = true;
+                            if (refreshListener != null) {
+                                refreshListener.onRefresh();
+                            }
                         }
                         isAnimating = false;
                     }
@@ -599,14 +636,14 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
             animatorToRefresh.setFloatValues(Math.abs(overScroll), refreshHeight);
         }
         animatorToRefresh.start();
+        isAnimating = true;
     }
 
     /**
      * 动画移动到加载更多位置
      */
     private void animateToLoad() {
-        if (isAnimating) return;
-        isAnimating = true;
+        cancelAnimators();
         if (animatorToLoad == null) {
             animatorToLoad = ValueAnimator.ofFloat(overScroll, -loadHeight);
             animatorToLoad.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -614,14 +651,16 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
                 public void onAnimationUpdate(ValueAnimator animation) {
                     float height = (float) animation.getAnimatedValue();
                     overScroll = height;
-                    viewLoad.setTranslationY(overScroll / 2);
+                    viewLoadContainer.setTranslationY(overScroll / 2);
                     viewLoad.setHeight(Math.abs(overScroll), loadMidHeight, viewContentHeight / 2);
                     viewTarget.setTranslationY(overScroll);
                     if (height == -loadHeight) {
-                        viewLoad.setRefresh();
-                        isLoading = true;
-                        if (loadListener != null) {
-                            loadListener.onLoad();
+                        if (!isLoading) {
+                            viewLoad.setRefresh();
+                            isLoading = true;
+                            if (loadListener != null) {
+                                loadListener.onLoad();
+                            }
                         }
                         isAnimating = false;
                     }
@@ -632,6 +671,7 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
             animatorToLoad.setFloatValues(overScroll, -loadHeight);
         }
         animatorToLoad.start();
+        isAnimating = true;
         isPullingUp = false;
     }
 
@@ -639,70 +679,82 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
      * 动画移动到刷新初始位置
      */
     private void animateToRefreshReset() {
-        if (isAnimating) return;
-        isAnimating = true;
-        if (animatorToRefreshReset == null) {
-            animatorToRefreshReset = ValueAnimator.ofFloat(Math.abs(overScroll), 0);
-            animatorToRefreshReset.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    float height = (float) animation.getAnimatedValue();
-                    overScroll = height;
-                    viewRefreshContainer.setTranslationY(overScroll / 2);
-                    viewRefresh.setHeight(overScroll, refreshMidHeight, viewContentHeight / 2);
-                    viewTarget.setTranslationY(overScroll);
-                    isRefreshing = false;
-                    if (height == 0) {
-                        isAnimating = false;
-                    }
-                }
-            });
-            animatorToRefreshReset.setDuration(animateDuration);
+        if (overScroll == 0) {
+            isRefreshing = false;
         } else {
-            animatorToRefreshReset.setFloatValues(Math.abs(overScroll), 0);
+            cancelAnimators();
+            if (animatorToRefreshReset == null) {
+                animatorToRefreshReset = ValueAnimator.ofFloat(Math.abs(overScroll), 0);
+                animatorToRefreshReset.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        float height = (float) animation.getAnimatedValue();
+                        overScroll = height;
+                        viewRefreshContainer.setTranslationY(overScroll / 2);
+                        viewRefresh.setHeight(overScroll, refreshMidHeight, viewContentHeight / 2);
+                        viewTarget.setTranslationY(overScroll);
+                        isRefreshing = false;
+                        if (height == 0) {
+                            isAnimating = false;
+                        }
+                    }
+                });
+                animatorToRefreshReset.setDuration(animateDuration);
+            } else {
+                animatorToRefreshReset.setFloatValues(Math.abs(overScroll), 0);
+            }
+            animatorToRefreshReset.start();
+            isAnimating = true;
         }
-        animatorToRefreshReset.start();
     }
 
     /**
      * 动画移动到加载更多初始位置
      */
     private void animateToLoadReset() {
-        if (isAnimating) return;
-        isAnimating = true;
-        if (animatorToLoadReset == null) {
-            animatorToLoadReset = ValueAnimator.ofFloat(overScroll, 0);
-            animatorToLoadReset.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    float height = (float) animation.getAnimatedValue();
-                    overScroll = height;
-                    viewLoad.setTranslationY(overScroll / 2);
-                    viewLoad.setHeight(Math.abs(overScroll), loadMidHeight, viewContentHeight / 2);
-                    viewTarget.setTranslationY(overScroll);
-                    isLoading = false;
-                    if (height == 0) {
-                        isAnimating = false;
-                    }
-                }
-            });
-            animatorToLoadReset.setDuration(animateDuration);
+        if (overScroll == 0) {
+            isLoading = false;
         } else {
-            animatorToLoadReset.setFloatValues(overScroll, 0);
+            cancelAnimators();
+            if (animatorToLoadReset == null) {
+                animatorToLoadReset = ValueAnimator.ofFloat(overScroll, 0);
+                animatorToLoadReset.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        float height = (float) animation.getAnimatedValue();
+                        overScroll = height;
+                        viewLoadContainer.setTranslationY(overScroll / 2);
+                        viewLoad.setHeight(Math.abs(overScroll), loadMidHeight, viewContentHeight / 2);
+                        viewTarget.setTranslationY(overScroll);
+                        isLoading = false;
+                        if (height == 0) {
+                            isAnimating = false;
+                        }
+                    }
+                });
+                animatorToLoadReset.setDuration(animateDuration);
+            } else {
+                animatorToLoadReset.setFloatValues(overScroll, 0);
+            }
+            animatorToLoadReset.start();
+            isAnimating = true;
         }
-        animatorToLoadReset.start();
+    }
+
+    private void cancelAnimators() {
+        if (animatorToRefresh != null) animatorToRefresh.cancel();
+        if (animatorToRefreshReset != null) animatorToRefreshReset.cancel();
+        if (animatorToLoad != null) animatorToLoad.cancel();
+        if (animatorToLoadReset != null) animatorToLoadReset.cancel();
     }
 
     /**
      * 全部恢复到初始位置
      */
     private void reset() {
-        if (animatorToRefresh != null) animatorToRefresh.cancel();
-        if (animatorToRefreshReset != null) animatorToRefreshReset.cancel();
-        if (animatorToLoad != null) animatorToLoad.cancel();
-        if (animatorToLoadReset != null) animatorToLoadReset.cancel();
+        cancelAnimators();
         viewRefreshContainer.setTranslationY(0);
-        viewLoad.setTranslationY(0);
+        viewLoadContainer.setTranslationY(0);
         viewTarget.setTranslationY(0);
     }
 

@@ -8,11 +8,11 @@ public interface Refresh {
     /**
      * 手指拖动中
      *
-     * @param dragDistance      手指拖动的距离
-     * @param distanceToRefresh 下拉到触发刷新位置的距离
-     * @param totalDistance     总的下拉空间
+     * @param height        显示出来的区域高度
+     * @param refreshHeight 下拉到触发刷新位置的显示区域高度
+     * @param totalHeight   总的显示区域高度
      */
-    void setHeight(float dragDistance, float distanceToRefresh, float totalDistance);
+    void setHeight(float height, float refreshHeight, float totalHeight);
 
     /**
      * 触发刷新

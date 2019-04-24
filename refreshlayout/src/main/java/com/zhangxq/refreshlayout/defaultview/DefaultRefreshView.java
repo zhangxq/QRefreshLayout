@@ -43,7 +43,6 @@ public class DefaultRefreshView extends RefreshView {
 
     @Override
     public void setHeight(float dragDistance, float distanceToRefresh, float totalDistance) {
-        mProgress.stop();
         moveSpinner(dragDistance, distanceToRefresh, totalDistance);
     }
 
@@ -57,12 +56,12 @@ public class DefaultRefreshView extends RefreshView {
 
     @Override
     public void setPullToRefresh() {
-
+        mProgress.stop();
     }
 
     @Override
     public void setRefeaseToRefresh() {
-
+        mProgress.stop();
     }
 
     public void setColorSchemeColors(@ColorInt int... colors) {
