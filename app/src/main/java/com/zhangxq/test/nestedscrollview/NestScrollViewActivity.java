@@ -14,16 +14,16 @@ import com.zhangxq.test.R;
  */
 
 public class NestScrollViewActivity extends AppCompatActivity implements QRefreshLayout.OnRefreshListener, QRefreshLayout.OnLoadListener {
-    private QRefreshLayout QRefreshLayout;
+    private QRefreshLayout qRefreshLayout;
     private ImageView imageView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nestedscrollview);
-        QRefreshLayout = findViewById(R.id.refreshLayout);
-        QRefreshLayout.setOnRefreshListener(this);
-        QRefreshLayout.setOnLoadListener(this);
+        qRefreshLayout = findViewById(R.id.refreshLayout);
+        qRefreshLayout.setOnRefreshListener(this);
+        qRefreshLayout.setOnLoadListener(this);
 
         imageView = findViewById(R.id.imageView);
     }
@@ -34,7 +34,7 @@ public class NestScrollViewActivity extends AppCompatActivity implements QRefres
             @Override
             public void run() {
                 imageView.setRotationY(imageView.getRotationY() + 180);
-                QRefreshLayout.setRefreshing(false);
+                qRefreshLayout.setRefreshing(false);
             }
         }, 1000);
     }
@@ -45,7 +45,7 @@ public class NestScrollViewActivity extends AppCompatActivity implements QRefres
             @Override
             public void run() {
                 imageView.setRotationY(imageView.getRotationY() + 180);
-                QRefreshLayout.setLoading(false);
+                qRefreshLayout.setLoading(false);
             }
         }, 1000);
     }

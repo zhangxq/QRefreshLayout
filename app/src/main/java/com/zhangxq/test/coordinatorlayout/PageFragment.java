@@ -23,7 +23,7 @@ import java.util.List;
 
 public class PageFragment extends Fragment implements QRefreshLayout.OnRefreshListener, QRefreshLayout.OnLoadListener {
     private RecyclerView recyclerView;
-    private QRefreshLayout QRefreshLayout;
+    private QRefreshLayout qRefreshLayout;
 
     private List<String> datas = new ArrayList<>();
     private RecyclerAdapter adapter;
@@ -32,9 +32,9 @@ public class PageFragment extends Fragment implements QRefreshLayout.OnRefreshLi
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_page, null);
         recyclerView = view.findViewById(R.id.recyclerView);
-        QRefreshLayout = view.findViewById(R.id.refreshLayout);
-        QRefreshLayout.setOnRefreshListener(this);
-        QRefreshLayout.setOnLoadListener(this);
+        qRefreshLayout = view.findViewById(R.id.refreshLayout);
+        qRefreshLayout.setOnRefreshListener(this);
+        qRefreshLayout.setOnLoadListener(this);
 
         adapter = new RecyclerAdapter();
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -65,7 +65,7 @@ public class PageFragment extends Fragment implements QRefreshLayout.OnRefreshLi
             @Override
             public void run() {
                 down();
-                QRefreshLayout.setRefreshing(false);
+                qRefreshLayout.setRefreshing(false);
             }
         }, 1000);
     }
@@ -76,7 +76,7 @@ public class PageFragment extends Fragment implements QRefreshLayout.OnRefreshLi
             @Override
             public void run() {
                 up();
-                QRefreshLayout.setLoading(false);
+                qRefreshLayout.setLoading(false);
             }
         }, 1000);
     }

@@ -1,6 +1,5 @@
 package com.zhangxq.refreshlayout;
 
-import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.support.annotation.ColorInt;
@@ -12,7 +11,6 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ListViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -75,6 +73,7 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
 
     private OnRefreshListener refreshListener;
     private OnLoadListener loadListener;
+    private ListScrollListener listScrollListener;
 
     public QRefreshLayout(Context context) {
         this(context, null);
@@ -259,6 +258,15 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
         return isLoading;
     }
 
+    /**
+     * 设置ListView滚动监听
+     *
+     * @param listener
+     */
+    public void setListViewScrollListener(ListScrollListener listener) {
+        this.listScrollListener = listener;
+    }
+
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         final int width = getMeasuredWidth();
@@ -331,10 +339,16 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
             ((ListView) viewTarget).setOnScrollListener(new AbsListView.OnScrollListener() {
                 @Override
                 public void onScrollStateChanged(AbsListView view, int scrollState) {
+                    if (listScrollListener != null) {
+                        listScrollListener.onScrollStateChanged(view, scrollState);
+                    }
                 }
 
                 @Override
                 public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                    if (listScrollListener != null) {
+                        listScrollListener.onScroll(view, firstVisibleItem, visibleItemCount, totalItemCount);
+                    }
                     QRefreshLayout.this.onScroll();
                 }
             });
@@ -798,5 +812,11 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
 
     public interface OnLoadListener {
         void onLoad();
+    }
+
+    public interface ListScrollListener {
+        void onScrollStateChanged(AbsListView view, int scrollState);
+
+        void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount);
     }
 }
