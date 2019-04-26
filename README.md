@@ -3,7 +3,8 @@
 ### 效果展示
 ![下拉刷新和加载更多](http://upload-images.jianshu.io/upload_images/6425806-82c42b4ac11b9ccf.gif?imageMogr2/auto-orient/strip)
 ![与Nested滚动兼容效果](http://upload-images.jianshu.io/upload_images/6425806-c7caf713a04bb54c.gif?imageMogr2/auto-orient/strip)
-
+### demo下载
+[demo下载](https://github.com/zhangxq/QRefreshLayout/blob/master/app-debug.apk)
 ### 使用方式
 ```
 allprojects {
