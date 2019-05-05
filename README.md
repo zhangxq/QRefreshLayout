@@ -5,6 +5,10 @@
 ![与Nested滚动兼容效果](http://upload-images.jianshu.io/upload_images/6425806-c7caf713a04bb54c.gif?imageMogr2/auto-orient/strip)
 ### demo下载
 [demo下载](https://github.com/zhangxq/QRefreshLayout/blob/master/app-debug.apk)
+### 版本更新说明
+1.0.7 新增滑动距离，刷新高度初始化接口
+
+1.0.6 基础稳定版
 ### 使用方式
 ```
 allprojects {
@@ -55,7 +59,11 @@ refreshLayout.setOnLoadListener(this);
 | setLoadView | 设置加载更多view |
 | setLoadEnable | 设置加载更多开关， setOnLoadListener调用后默认开启 |
 | setAutoLoad  |  设置自动加载更多开关，setOnLoadListener调用后默认开启 |
-|setListViewScrollListener|设置ListView的滚动监听器（由于需要做自动加更多，所以占用了监听器，在这里回调回来）|
+| setListViewScrollListener | 设置ListView的滚动监听器（由于需要做自动加更多，所以占用了监听器，在这里回调回来） |
+| setPullToRefreshHeight | 设置下拉到"释放即可更新"的高度（默认170px） |
+| setLoadToRefreshHeight | 设置上拉到"释放即可加载更多"的高度（默认170px） |
+| setRefreshHeight | 设置下拉刷新动画高度（默认150px，需要在setRefreshing之前调用） |
+| setLoadHeight | 设置加载更多动画高度（默认110px） |
 ### 自定义下拉刷新和加载更多view
 setRefreshView 和 setLoadView 两个方法用于接收用户自定义的下拉刷新和加载更多动画view，参数都是接收一个继承自RefreshView的子类，RefreshView实现了一个Refresh接口，代码如下：
 ```
