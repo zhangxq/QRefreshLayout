@@ -53,10 +53,10 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
     private RefreshView viewRefresh; // 下拉刷新view
     private RefreshView viewLoad; // 加载更多view
     private final int viewContentHeight = 2000; // 刷新动画内容区高度
-    private final int refreshMidHeight = 170; // 刷新高度，超过这个高度，松手即可刷新
-    private final int loadMidHeight = 170; // 加载更多高度，超过这个高度，松手即可加载更多
-    private final int refreshHeight = 150; // 刷新动画高度
-    private final int loadHeight = 110; // 加载更多动画高度
+    private int refreshMidHeight = 170; // 刷新高度，超过这个高度，松手即可刷新
+    private int loadMidHeight = 170; // 加载更多高度，超过这个高度，松手即可加载更多
+    private int refreshHeight = 150; // 刷新动画高度
+    private int loadHeight = 110; // 加载更多动画高度
     private final int animateDuration = 100; // 动画时间ms
 
     // nested 相关参数
@@ -97,6 +97,47 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
         ensureTarget();
     }
 
+    /**
+     * 设置下拉到"释放即可更新"的高度（默认170px）
+     *
+     * @param height
+     */
+    public void setPullToRefreshHeight(int height) {
+        refreshMidHeight = height;
+    }
+
+    /**
+     * 设置上拉到"释放即可加载更多"的高度（默认170px）
+     *
+     * @param height
+     */
+    public void setLoadToRefreshHeight(int height) {
+        loadMidHeight = height;
+    }
+
+    /**
+     * 设置下拉刷新动画高度（默认150px，需要在setRefreshing之前调用）
+     *
+     * @param height
+     */
+    public void setRefreshHeight(int height) {
+        refreshHeight = height;
+    }
+
+    /**
+     * 设置加载更多动画高度（默认110px）
+     *
+     * @param height
+     */
+    public void setLoadHeight(int height) {
+        loadHeight = height;
+    }
+
+    /**
+     * 设置是否可以加载更多
+     *
+     * @param isEnable
+     */
     public void setLoadEnable(boolean isEnable) {
         this.isLoadEnable = isEnable;
         if (isLoadEnable) {

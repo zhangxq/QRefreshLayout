@@ -41,7 +41,9 @@ public class ListViewActivity extends AppCompatActivity implements QRefreshLayou
         qRefreshLayout.setOnLoadListener(this);
         qRefreshLayout.setRefreshView(new MyRefreshView(this));
         qRefreshLayout.setLoadView(new MyLoadView(this));
+        qRefreshLayout.setRefreshHeight(110);
         qRefreshLayout.setRefreshing(true);
+        qRefreshLayout.setPullToRefreshHeight(200);
 
         listView = findViewById(R.id.listView);
         listView.setOnItemClickListener(this);
