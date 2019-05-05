@@ -1,5 +1,7 @@
 # QRefreshLayout
 下拉刷新，上拉加载更多，自动加载更多，用法同SwipeRefreshLayout，兼容所有view，兼容nested滚动，可以自定义刷新动画
+
+不定期更新，大家有什么想加的功能可以在issues里提出来，我会尽力而为。
 ### 效果展示
 ![下拉刷新和加载更多](http://upload-images.jianshu.io/upload_images/6425806-82c42b4ac11b9ccf.gif?imageMogr2/auto-orient/strip)
 ![与Nested滚动兼容效果](http://upload-images.jianshu.io/upload_images/6425806-c7caf713a04bb54c.gif?imageMogr2/auto-orient/strip)
