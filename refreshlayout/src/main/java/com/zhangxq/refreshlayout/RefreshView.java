@@ -21,4 +21,19 @@ public abstract class RefreshView extends RelativeLayout implements Refresh {
         super(context, attrs);
         setGravity(Gravity.CENTER);
     }
+
+    /**
+     * 释放即可到达二楼
+     */
+    public abstract void setReleaseToSecondFloor();
+
+    /**
+     * 展示二楼
+     */
+    public abstract void setToSecondFloor();
+
+    /**
+     * 回到一楼
+     */
+    public abstract void setToFirstFloor();
 }

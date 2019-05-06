@@ -58,10 +58,27 @@ public class DefaultRefreshView extends RefreshView {
 
     @Override
     public void setPullToRefresh() {
+
     }
 
     @Override
-    public void setRefeaseToRefresh() {
+    public void setReleaseToRefresh() {
+
+    }
+
+    @Override
+    public void setReleaseToSecondFloor() {
+
+    }
+
+    @Override
+    public void setToSecondFloor() {
+
+    }
+
+    @Override
+    public void setToFirstFloor() {
+
     }
 
     public void setColorSchemeColors(@ColorInt int... colors) {

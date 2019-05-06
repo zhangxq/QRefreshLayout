@@ -24,7 +24,7 @@ import java.util.List;
  * Created by zhangxiaoqi on 2019/4/16.
  */
 
-public class ListViewActivity extends AppCompatActivity implements QRefreshLayout.OnRefreshListener, QRefreshLayout.OnLoadListener, AdapterView.OnItemClickListener {
+public class ListViewActivity extends AppCompatActivity implements QRefreshLayout.OnRefreshListener, QRefreshLayout.OnLoadListener, AdapterView.OnItemClickListener, Listener {
     private ListView listView;
     private ListAdapter adapter;
     private List<String> datas = new ArrayList<>();
@@ -39,11 +39,12 @@ public class ListViewActivity extends AppCompatActivity implements QRefreshLayou
 
         qRefreshLayout.setOnRefreshListener(this);
         qRefreshLayout.setOnLoadListener(this);
-        qRefreshLayout.setRefreshView(new MyRefreshView(this));
-        qRefreshLayout.setLoadView(new MyLoadView(this));
+        qRefreshLayout.setIsCanSecondFloor(true);
         qRefreshLayout.setRefreshHeight(110);
-        qRefreshLayout.setRefreshing(true);
         qRefreshLayout.setPullToRefreshHeight(200);
+        qRefreshLayout.setRefreshView(new MyRefreshView(this).setListener(this));
+        qRefreshLayout.setLoadView(new MyLoadView(this));
+        qRefreshLayout.setRefreshing(true);
 
         listView = findViewById(R.id.listView);
         listView.setOnItemClickListener(this);
@@ -94,6 +95,11 @@ public class ListViewActivity extends AppCompatActivity implements QRefreshLayou
         Toast.makeText(this, position + "", Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    public void onBackFirstFloor() {
+        qRefreshLayout.setBackToFirstFloor();
+    }
+
     private class ListAdapter extends BaseAdapter {
 
         @Override
@@ -125,6 +131,15 @@ public class ListViewActivity extends AppCompatActivity implements QRefreshLayou
             }
 
             return convertView;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (qRefreshLayout.isSecondFloor()) {
+            qRefreshLayout.setBackToFirstFloor();
+        } else {
+            super.onBackPressed();
         }
     }
 }

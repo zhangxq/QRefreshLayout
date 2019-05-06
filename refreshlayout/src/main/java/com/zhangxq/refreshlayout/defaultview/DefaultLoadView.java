@@ -10,13 +10,14 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.zhangxq.refreshlayout.LoadView;
 import com.zhangxq.refreshlayout.RefreshView;
 
 /**
  * Created by zhangxiaoqi on 2019/4/17.
  */
 
-public class DefaultLoadView extends RefreshView {
+public class DefaultLoadView extends LoadView {
     private TextView tvContent;
     private ProgressBar progressBar;
 
@@ -64,7 +65,7 @@ public class DefaultLoadView extends RefreshView {
     }
 
     @Override
-    public void setRefeaseToRefresh() {
+    public void setReleaseToRefresh() {
         progressBar.setVisibility(GONE);
         tvContent.setText("释放加载更多");
     }

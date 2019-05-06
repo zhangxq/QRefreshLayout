@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.zhangxq.refreshlayout.LoadView;
 import com.zhangxq.refreshlayout.RefreshView;
 import com.zhangxq.test.R;
 
@@ -15,7 +16,7 @@ import com.zhangxq.test.R;
  * Created by zhangxiaoqi on 2019/4/17.
  */
 
-public class MyLoadView extends RefreshView {
+public class MyLoadView extends LoadView {
     private TextView tvContent;
     private View viewContent;
 
@@ -45,7 +46,7 @@ public class MyLoadView extends RefreshView {
     }
 
     @Override
-    public void setRefeaseToRefresh() {
+    public void setReleaseToRefresh() {
         tvContent.setText("松手");
     }
 }

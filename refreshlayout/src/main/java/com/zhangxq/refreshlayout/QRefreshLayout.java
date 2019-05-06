@@ -48,13 +48,16 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
     private boolean isAutoLoad; // 是否打开自动加载更多
     private boolean isTouchDown; // 手指是否按下
     private boolean isPullingUp; // 是否手指上滑
+    private boolean isInSecondFloor; // 是否正在二楼
+    private boolean isCanSecondFloor; // 是否存在二楼
     private RelativeLayout viewRefreshContainer; // 下拉刷新view容器
     private RelativeLayout viewLoadContainer; // 加载更多view容器
     private RefreshView viewRefresh; // 下拉刷新view
-    private RefreshView viewLoad; // 加载更多view
-    private final int viewContentHeight = 2000; // 刷新动画内容区高度
+    private LoadView viewLoad; // 加载更多view
+    private int viewContentHeight = 2000; // 刷新动画内容区高度
     private int refreshMidHeight = 170; // 刷新高度，超过这个高度，松手即可刷新
     private int loadMidHeight = 170; // 加载更多高度，超过这个高度，松手即可加载更多
+    private int secondFloorHeight = 300; // 二楼高度，超过这个高度，松手即可到达二楼
     private int refreshHeight = 150; // 刷新动画高度
     private int loadHeight = 110; // 加载更多动画高度
     private final int animateDuration = 100; // 动画时间ms
@@ -70,6 +73,9 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
     ValueAnimator animatorToRefreshReset; // 移动到刷新初始位置
     ValueAnimator animatorToLoad; // 移动到加载更多位置
     ValueAnimator animatorToLoadReset; // 移动到加载更多初始位置
+    ValueAnimator animatorToSecondFloor; // 移动到二楼
+    ValueAnimator animatorToFirstFloor; // 移动到一楼
+
 
     private OnRefreshListener refreshListener;
     private OnLoadListener loadListener;
@@ -134,6 +140,40 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
     }
 
     /**
+     * 设置下拉到"释放到达二楼"的高度
+     *
+     * @param height
+     */
+    public void setPullToSecondFloor(int height) {
+        secondFloorHeight = height;
+    }
+
+    /**
+     * 回到一楼
+     */
+    public void setBackToFirstFloor() {
+        animateToFirstFloor();
+    }
+
+    /**
+     * 当前是否在二楼
+     *
+     * @return
+     */
+    public boolean isSecondFloor() {
+        return isInSecondFloor;
+    }
+
+    /**
+     * 设置是否可以到达二楼
+     *
+     * @param isCanSecondFloor
+     */
+    public void setIsCanSecondFloor(boolean isCanSecondFloor) {
+        this.isCanSecondFloor = isCanSecondFloor;
+    }
+
+    /**
      * 设置是否可以加载更多
      *
      * @param isEnable
@@ -172,7 +212,7 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
      *
      * @param loadView
      */
-    public void setLoadView(RefreshView loadView) {
+    public void setLoadView(LoadView loadView) {
         this.viewLoad = loadView;
         viewLoadContainer.removeAllViews();
         viewLoadContainer.addView(viewLoad);
@@ -316,6 +356,7 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         final int width = getMeasuredWidth();
         final int height = getMeasuredHeight();
+        viewContentHeight = height;
         if (getChildCount() == 0) {
             return;
         }
@@ -337,13 +378,12 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
 
         viewRefreshContainer.layout(0, -viewContentHeight / 2, width, viewContentHeight / 2);
         viewLoadContainer.layout(0, height - viewContentHeight / 2, width, height + viewContentHeight / 2);
-
-
     }
 
     @Override
     public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        viewContentHeight = getMeasuredHeight();
         ensureTarget();
         if (viewTarget == null) {
             return;
@@ -416,7 +456,7 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        if (!isEnabled() || isAnimating || isNestedScrolling) {
+        if (!isEnabled() || isAnimating || isNestedScrolling || isInSecondFloor) {
             return false;
         }
         switch (ev.getActionMasked()) {
@@ -458,7 +498,7 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (!isEnabled() || isAnimating || isNestedScrolling) {
+        if (!isEnabled() || isAnimating || isNestedScrolling || isInSecondFloor) {
             return false;
         }
         switch (event.getActionMasked()) {
@@ -487,7 +527,11 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
                         }
                         if (!isRefreshing) {
                             if (overScroll > refreshMidHeight) {
-                                viewRefresh.setRefeaseToRefresh();
+                                if (overScroll > secondFloorHeight && isCanSecondFloor) {
+                                    viewRefresh.setReleaseToSecondFloor();
+                                } else {
+                                    viewRefresh.setReleaseToRefresh();
+                                }
                             } else {
                                 viewRefresh.setPullToRefresh();
                             }
@@ -510,7 +554,7 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
                         }
                         if (!isLoading) {
                             if (overScroll < -loadMidHeight) {
-                                viewLoad.setRefeaseToRefresh();
+                                viewLoad.setReleaseToRefresh();
                             } else {
                                 viewLoad.setPullToRefresh();
                             }
@@ -625,9 +669,9 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
             }
             viewRefreshContainer.setTranslationY(overScroll / 2);
             viewTarget.setTranslationY(overScroll);
-            viewRefresh.setHeight(overScroll, refreshMidHeight, viewContentHeight / 2);
-            if (overScroll > refreshMidHeight) {
-                viewRefresh.setRefeaseToRefresh();
+            viewRefresh.setHeight(overScroll, refreshMidHeight, viewContentHeight);
+            if (overScroll > refreshMidHeight && isCanSecondFloor && !isRefreshing) {
+                viewRefresh.setReleaseToRefresh();
             } else {
                 viewRefresh.setPullToRefresh();
             }
@@ -638,9 +682,9 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
             }
             viewLoadContainer.setTranslationY(overScroll / 2);
             viewTarget.setTranslationY(overScroll);
-            viewLoad.setHeight(Math.abs(overScroll), loadMidHeight, viewContentHeight / 2);
+            viewLoad.setHeight(Math.abs(overScroll), loadMidHeight, viewContentHeight);
             if (overScroll < -loadMidHeight) {
-                viewLoad.setRefeaseToRefresh();
+                viewLoad.setReleaseToRefresh();
             } else {
                 viewLoad.setPullToRefresh();
             }
@@ -651,7 +695,11 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
         if (overScroll == 0) return;
         if (overScroll > 0) {
             if (overScroll > refreshMidHeight) {
-                animateToRefresh();
+                if (overScroll > secondFloorHeight && isCanSecondFloor && !isRefreshing) {
+                    animateToSecondFloor();
+                } else {
+                    animateToRefresh();
+                }
             } else {
                 if (!isRefreshing) {
                     animateToRefreshReset();
@@ -684,7 +732,7 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
                     overScroll = height;
                     viewRefreshContainer.setTranslationY(overScroll / 2);
                     if (!isRefreshing) {
-                        viewRefresh.setHeight(overScroll, refreshMidHeight, viewContentHeight / 2);
+                        viewRefresh.setHeight(overScroll, refreshMidHeight, viewContentHeight);
                     }
                     viewTarget.setTranslationY(overScroll);
                     if (height == refreshHeight) {
@@ -721,7 +769,7 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
                     overScroll = height;
                     viewLoadContainer.setTranslationY(overScroll / 2);
                     if (!isLoading) {
-                        viewLoad.setHeight(Math.abs(overScroll), loadMidHeight, viewContentHeight / 2);
+                        viewLoad.setHeight(Math.abs(overScroll), loadMidHeight, viewContentHeight);
                     }
                     viewTarget.setTranslationY(overScroll);
                     if (height == -loadHeight) {
@@ -761,7 +809,7 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
                         float height = (float) animation.getAnimatedValue();
                         overScroll = height;
                         viewRefreshContainer.setTranslationY(overScroll / 2);
-                        viewRefresh.setHeight(overScroll, refreshMidHeight, viewContentHeight / 2);
+                        viewRefresh.setHeight(overScroll, refreshMidHeight, viewContentHeight);
                         viewTarget.setTranslationY(overScroll);
                         isRefreshing = false;
                         if (height == 0) {
@@ -794,7 +842,7 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
                         float height = (float) animation.getAnimatedValue();
                         overScroll = height;
                         viewLoadContainer.setTranslationY(overScroll / 2);
-                        viewLoad.setHeight(Math.abs(overScroll), loadMidHeight, viewContentHeight / 2);
+                        viewLoad.setHeight(Math.abs(overScroll), loadMidHeight, viewContentHeight);
                         viewTarget.setTranslationY(overScroll);
                         isLoading = false;
                         if (height == 0) {
@@ -810,6 +858,61 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
         }
     }
 
+    private void animateToSecondFloor() {
+        if (isAnimating) return;
+        isAnimating = true;
+        if (animatorToSecondFloor == null) {
+            animatorToSecondFloor = ValueAnimator.ofFloat(overScroll, viewContentHeight);
+            animatorToSecondFloor.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    float height = (float) animation.getAnimatedValue();
+                    overScroll = height;
+                    viewRefreshContainer.setTranslationY(overScroll / 2);
+                    viewLoadContainer.setTranslationY(overScroll / 2);
+                    viewRefresh.setHeight(Math.abs(overScroll), loadMidHeight, viewContentHeight);
+                    viewTarget.setTranslationY(overScroll);
+                    if (height == viewContentHeight) {
+                        isAnimating = false;
+                        isInSecondFloor = true;
+                        viewRefresh.setToSecondFloor();
+                    }
+                }
+            });
+            animatorToSecondFloor.setDuration(animateDuration);
+        } else {
+            animatorToSecondFloor.setFloatValues(overScroll, viewContentHeight);
+        }
+        animatorToSecondFloor.start();
+    }
+
+    private void animateToFirstFloor() {
+        if (isAnimating) return;
+        isAnimating = true;
+        if (animatorToFirstFloor == null) {
+            animatorToFirstFloor = ValueAnimator.ofFloat(overScroll, 0);
+            animatorToFirstFloor.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    float height = (float) animation.getAnimatedValue();
+                    overScroll = height;
+                    viewRefreshContainer.setTranslationY(overScroll / 2);
+                    viewLoadContainer.setTranslationY(overScroll / 2);
+                    viewRefresh.setHeight(Math.abs(overScroll), loadMidHeight, viewContentHeight);
+                    viewTarget.setTranslationY(overScroll);
+                    if (height == 0) {
+                        isAnimating = false;
+                        isInSecondFloor = false;
+                        viewRefresh.setToFirstFloor();
+                    }
+                }
+            });
+        } else {
+            animatorToFirstFloor.setFloatValues(overScroll, 0);
+        }
+        animatorToFirstFloor.start();
+    }
+
     /**
      * 全部恢复到初始位置
      */
@@ -818,6 +921,7 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
         if (animatorToRefreshReset != null) animatorToRefreshReset.cancel();
         if (animatorToLoad != null) animatorToLoad.cancel();
         if (animatorToLoadReset != null) animatorToLoadReset.cancel();
+        if (animatorToSecondFloor != null) animatorToSecondFloor.cancel();
         viewRefreshContainer.setTranslationY(0);
         viewLoadContainer.setTranslationY(0);
         viewTarget.setTranslationY(0);
