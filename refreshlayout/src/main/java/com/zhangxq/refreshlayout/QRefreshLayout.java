@@ -11,6 +11,7 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ListViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -171,6 +172,19 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
      */
     public void setIsCanSecondFloor(boolean isCanSecondFloor) {
         this.isCanSecondFloor = isCanSecondFloor;
+    }
+
+    /**
+     * 设置二楼view，仅限于使用默认header
+     *
+     * @param secondFloorView
+     */
+    public void setSecondFloorView(View secondFloorView) {
+        if (viewRefresh instanceof DefaultRefreshView) {
+            ((DefaultRefreshView) viewRefresh).setSecondFloorView(secondFloorView);
+        } else {
+            Log.d("QRefreshLayout", "no DefaultRefreshView, please set secondFloorView by yourself");
+        }
     }
 
     /**
@@ -670,8 +684,12 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
             viewRefreshContainer.setTranslationY(overScroll / 2);
             viewTarget.setTranslationY(overScroll);
             viewRefresh.setHeight(overScroll, refreshMidHeight, viewContentHeight);
-            if (overScroll > refreshMidHeight && isCanSecondFloor && !isRefreshing) {
-                viewRefresh.setReleaseToRefresh();
+            if (overScroll > refreshMidHeight) {
+                if (overScroll > secondFloorHeight && isCanSecondFloor && !isRefreshing) {
+                    viewRefresh.setReleaseToSecondFloor();
+                } else {
+                    viewRefresh.setReleaseToRefresh();
+                }
             } else {
                 viewRefresh.setPullToRefresh();
             }

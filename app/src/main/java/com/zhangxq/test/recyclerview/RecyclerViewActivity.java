@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.zhangxq.refreshlayout.QRefreshLayout;
@@ -38,6 +39,11 @@ public class RecyclerViewActivity extends AppCompatActivity implements QRefreshL
         qRefreshLayout.setOnRefreshListener(this);
         qRefreshLayout.setOnLoadListener(this);
         qRefreshLayout.setRefreshing(true);
+        qRefreshLayout.setIsCanSecondFloor(true);
+        ImageView imageView = new ImageView(this);
+        imageView.setImageResource(R.drawable.img_test);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        qRefreshLayout.setSecondFloorView(imageView);
 
         adapter = new RecyclerAdapter();
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -80,6 +86,15 @@ public class RecyclerViewActivity extends AppCompatActivity implements QRefreshL
                 qRefreshLayout.setLoading(false);
             }
         }, 1000);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (qRefreshLayout.isSecondFloor()) {
+            qRefreshLayout.setBackToFirstFloor();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     private class RecyclerAdapter extends RecyclerView.Adapter<ItemHolder> {

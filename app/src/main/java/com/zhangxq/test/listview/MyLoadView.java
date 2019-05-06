@@ -5,11 +5,9 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.zhangxq.refreshlayout.LoadView;
-import com.zhangxq.refreshlayout.RefreshView;
 import com.zhangxq.test.R;
 
 /**
@@ -26,7 +24,7 @@ public class MyLoadView extends LoadView {
 
     public MyLoadView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        viewContent = LayoutInflater.from(context).inflate(R.layout.view_load, null);
+        viewContent = LayoutInflater.from(context).inflate(R.layout.view_my_load, null);
         addView(viewContent);
         tvContent = viewContent.findViewById(R.id.tvContent);
     }

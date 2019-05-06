@@ -33,7 +33,7 @@ public class MyRefreshView extends RefreshView implements View.OnClickListener {
 
     public MyRefreshView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        viewContent = LayoutInflater.from(context).inflate(R.layout.view_refresh, null);
+        viewContent = LayoutInflater.from(context).inflate(R.layout.view_my_refresh, null);
         addView(viewContent);
         tvContent = viewContent.findViewById(R.id.tvContent);
         viewContainer = viewContent.findViewById(R.id.viewContainer);

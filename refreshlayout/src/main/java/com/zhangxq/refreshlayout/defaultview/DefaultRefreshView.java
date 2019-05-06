@@ -5,10 +5,12 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.CircularProgressDrawable;
 import android.util.AttributeSet;
-import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
+import android.widget.TextView;
 
+import com.zhangxq.refreshlayout.R;
 import com.zhangxq.refreshlayout.RefreshView;
 
 /**
@@ -17,6 +19,9 @@ import com.zhangxq.refreshlayout.RefreshView;
 
 public class DefaultRefreshView extends RefreshView {
     private CircleImageView imageView;
+    private TextView tvSecondFloor;
+    private View viewContainer;
+    private View viewCover;
     private CircularProgressDrawable mProgress;
 
     public DefaultRefreshView(Context context) {
@@ -25,16 +30,13 @@ public class DefaultRefreshView extends RefreshView {
 
     public DefaultRefreshView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        RelativeLayout container = new RelativeLayout(context);
-        container.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        addView(container);
-        imageView = new CircleImageView(context);
-        container.setGravity(Gravity.CENTER);
-        container.addView(imageView);
-        final float density = getContext().getResources().getDisplayMetrics().density;
-        imageView.getLayoutParams().width = (int) (40 * density);
-        imageView.getLayoutParams().height = (int) (40 * density);
+        View view = LayoutInflater.from(context).inflate(R.layout.view_default_refresh, null);
+        addView(view);
 
+        viewContainer = view.findViewById(R.id.viewContainer);
+        tvSecondFloor = view.findViewById(R.id.tvSecondFloor);
+        viewCover = view.findViewById(R.id.viewCover);
+        imageView = view.findViewById(R.id.imageView);
         mProgress = new CircularProgressDrawable(getContext());
         mProgress.setStyle(CircularProgressDrawable.DEFAULT);
         imageView.setImageDrawable(mProgress);
@@ -42,10 +44,16 @@ public class DefaultRefreshView extends RefreshView {
         mProgress.stop();
     }
 
+    public void setSecondFloorView(View secondFloorView) {
+        secondFloorView.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        addView(secondFloorView, 0);
+    }
+
     @Override
     public void setHeight(float dragDistance, float distanceToRefresh, float totalDistance) {
         mProgress.stop();
         moveSpinner(dragDistance, distanceToRefresh, totalDistance);
+        viewCover.setAlpha((totalDistance - dragDistance) / totalDistance);
     }
 
     @Override
@@ -58,27 +66,29 @@ public class DefaultRefreshView extends RefreshView {
 
     @Override
     public void setPullToRefresh() {
-
+        tvSecondFloor.setVisibility(GONE);
     }
 
     @Override
     public void setReleaseToRefresh() {
-
+        tvSecondFloor.setVisibility(GONE);
     }
 
     @Override
     public void setReleaseToSecondFloor() {
-
+        tvSecondFloor.setVisibility(VISIBLE);
     }
 
     @Override
     public void setToSecondFloor() {
-
+        viewCover.setAlpha(0);
+        viewContainer.setVisibility(GONE);
     }
 
     @Override
     public void setToFirstFloor() {
-
+        viewCover.setAlpha(1);
+        viewContainer.setVisibility(VISIBLE);
     }
 
     public void setColorSchemeColors(@ColorInt int... colors) {
