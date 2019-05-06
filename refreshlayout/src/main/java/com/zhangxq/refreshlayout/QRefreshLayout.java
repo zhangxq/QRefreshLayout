@@ -145,7 +145,7 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
      *
      * @param height
      */
-    public void setPullToSecondFloor(int height) {
+    public void setPullToSecondFloorHeight(int height) {
         secondFloorHeight = height;
     }
 
