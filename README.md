@@ -6,14 +6,8 @@
 ![下拉刷新和加载更多](http://upload-images.jianshu.io/upload_images/6425806-82c42b4ac11b9ccf.gif?imageMogr2/auto-orient/strip)
 ![与Nested滚动兼容效果](http://upload-images.jianshu.io/upload_images/6425806-c7caf713a04bb54c.gif?imageMogr2/auto-orient/strip)
 ![下拉到二楼](https://upload-images.jianshu.io/upload_images/6425806-49cb4c2a398d843e.gif?imageMogr2/auto-orient/strip)
-### demo下载
-[demo下载](https://github.com/zhangxq/QRefreshLayout/blob/master/app-release.apk)
-### 版本更新说明
-1.0.8 新增下拉到二楼功能，设置footer接口发生变化
-
-1.0.7 新增滑动距离、刷新高度初始化接口
-
-1.0.6 基础稳定版
+### [demo下载](https://github.com/zhangxq/QRefreshLayout/blob/master/app-release.apk)
+### [版本更新说明](https://github.com/zhangxq/QRefreshLayout/releases)
 ### 使用方式
 ```
 allprojects {
