@@ -57,7 +57,7 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
     private int viewContentHeight = 2000; // 刷新动画内容区高度
     private int refreshMidHeight = 170; // 刷新高度，超过这个高度，松手即可刷新
     private int loadMidHeight = 170; // 加载更多高度，超过这个高度，松手即可加载更多
-    private int secondFloorHeight = 300; // 二楼高度，超过这个高度，松手即可到达二楼
+    private int secondFloorHeight = 500; // 二楼高度，超过这个高度，松手即可到达二楼
     private int refreshHeight = 150; // 刷新动画高度
     private int loadHeight = 110; // 加载更多动画高度
     private final int animateDuration = 100; // 动画时间ms
@@ -140,7 +140,7 @@ public class QRefreshLayout extends ViewGroup implements NestedScrollingParent, 
     }
 
     /**
-     * 设置下拉到"释放到达二楼"的高度
+     * 设置下拉到"释放到达二楼"的高度（默认500px）
      *
      * @param height
      */
