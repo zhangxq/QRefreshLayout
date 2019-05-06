@@ -28,7 +28,6 @@ public class ImageViewActivity extends AppCompatActivity implements QRefreshLayo
         qRefreshLayout.setOnLoadListener(this);
         qRefreshLayout.setColorSchemeColors(0xffff0000, 0xff00ff00, 0xff0000ff);
         qRefreshLayout.setProgressBackgroundColorSchemeColor(0xffabcdef);
-        qRefreshLayout.setIsCanSecondFloor(true);
 
         imageView = findViewById(R.id.imageView);
     }
