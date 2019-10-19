@@ -9,7 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +31,7 @@ public class ListViewActivity extends AppCompatActivity implements QRefreshLayou
     private ListAdapter adapter;
     private List<String> datas = new ArrayList<>();
     private QRefreshLayout qRefreshLayout;
+    private boolean isNoMore;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -75,6 +78,8 @@ public class ListViewActivity extends AppCompatActivity implements QRefreshLayou
             public void run() {
                 down();
                 qRefreshLayout.setRefreshing(false);
+                qRefreshLayout.setLoadEnable(true);
+                isNoMore = false;
             }
         }, 1000);
     }
@@ -86,6 +91,12 @@ public class ListViewActivity extends AppCompatActivity implements QRefreshLayou
             public void run() {
                 up();
                 qRefreshLayout.setLoading(false);
+                if (datas.size() > 30) {
+                    qRefreshLayout.setLoadEnable(false);
+                    datas.add("没有更多了~~");
+                    isNoMore = true;
+                    adapter.notifyDataSetChanged();
+                }
             }
         }, 1000);
     }
@@ -124,6 +135,17 @@ public class ListViewActivity extends AppCompatActivity implements QRefreshLayou
             }
             TextView tvTest = convertView.findViewById(R.id.tvTest);
             tvTest.setText(getItem(position));
+
+            if (isNoMore && position == datas.size() - 1) {
+                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) tvTest.getLayoutParams();
+                params.height = DpHelper.dip2px(ListViewActivity.this, 50);
+                tvTest.setLayoutParams(params);
+            } else {
+                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) tvTest.getLayoutParams();
+                params.height = DpHelper.dip2px(ListViewActivity.this, 100);
+                tvTest.setLayoutParams(params);
+            }
+
             if (position % 2 == 0) {
                 tvTest.setBackgroundColor(0xffabcdef);
             } else {
