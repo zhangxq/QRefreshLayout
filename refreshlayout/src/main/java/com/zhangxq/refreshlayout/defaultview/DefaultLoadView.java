@@ -1,9 +1,8 @@
 package com.zhangxq.refreshlayout.defaultview;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -11,7 +10,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.zhangxq.refreshlayout.LoadView;
-import com.zhangxq.refreshlayout.RefreshView;
 
 /**
  * Created by zhangxiaoqi on 2019/4/17.
